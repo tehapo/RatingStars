@@ -1,0 +1,5 @@
+<module>
+	<inherits name="com.vaadin.terminal.gwt.DefaultWidgetSet" /> 
+	<entry-point class="com.vaadin.incubator.ratingstars.component.gwt.client.RatingStarsWidgetset"/>
+	<stylesheet src="ratingstars/styles.css"/>
+</module>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+		Build script for building the client-side widgetset of 
+		the RatingStars component.
+		
+		Update build.properties to match your own environment!
+-->
+
+<project name="RatingStars" default="compile-widgetset" basedir=".">
+
+	<property file="build.properties"/>
+		
+	<target name="compile-widgetset">		
+		<java classname="com.google.gwt.dev.Compiler" failonerror="yes" fork="yes" maxmemory="128m">
+			<arg value="-war"/>
+			<arg value="WebContent/VAADIN/widgetsets"/>
+			<arg value="-style"/>
+			<arg value="OBF"/>
+			<arg value="${widgetset}"/>
+			<jvmarg value="-Xss8m"/>
+			<classpath>
+				<pathelement location="${gwt-user.dir}/gwt-user.jar"/>
+				<pathelement location="${gwt-dev.dir}/gwt-dev-${platform}.jar"/>
+				<pathelement location="${vaadin}"/>
+				<pathelement location="src"/>
+			</classpath>
+		</java>
+	</target>
+
+
+</project>
