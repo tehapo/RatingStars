@@ -12,7 +12,8 @@ import com.vaadin.ui.AbstractField;
  * @author Teemu Pöntelin / IT Mill Ltd
  */
 @SuppressWarnings("unchecked")
-public class RatingStars extends AbstractField {
+public class RatingStars extends AbstractField implements
+        Comparable<RatingStars> {
 
     private static final long serialVersionUID = -3594458506374404590L;
 
@@ -89,6 +90,11 @@ public class RatingStars extends AbstractField {
         if (variables.containsKey("value")) {
             setValue(Double.valueOf(variables.get("value").toString()));
         }
+    }
+
+    @Override
+    public int compareTo(RatingStars o) {
+        return ((Double) this.getValue()).compareTo((Double) o.getValue());
     }
 
 }

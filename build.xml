@@ -28,5 +28,22 @@
 		</java>
 	</target>
 
-
+	<target name="package-widgetset" depends="compile-widgetset">
+		<delete dir="dist"/>
+		<mkdir dir="dist"/>
+		<mkdir dir="dist/temp"/>
+				
+		<!-- copy all files to add into the jar package -->
+		<copy todir="dist/temp/VAADIN">
+			<fileset dir="WebContent/VAADIN"/>
+		</copy>
+		<copy todir="dist/temp">
+			<fileset dir="build/classes"/>
+		</copy>		
+		
+		<jar destfile="dist/ratingstars-${component-version}.jar" basedir="dist/temp"/>
+		
+		<delete dir="dist/temp"/>
+	</target>	
+	
 </project>
