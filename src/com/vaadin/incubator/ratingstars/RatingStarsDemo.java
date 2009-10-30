@@ -8,12 +8,12 @@ import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.incubator.ratingstars.component.RatingStars;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
@@ -69,6 +69,7 @@ public class RatingStarsDemo extends Application {
         // create and populate the movie table
         table = new Table("Rate your favourite movies");
         table.addContainerProperty("Movie", String.class, null);
+        table.addContainerProperty("Comment", TextField.class, null);
         table.addContainerProperty("Your rating", RatingStars.class, null);
         table.addContainerProperty("Average rating", RatingStars.class, null);
         populateTable();
@@ -118,15 +119,21 @@ public class RatingStarsDemo extends Application {
      * Populate the table with some random data.
      */
     private void populateTable() {
+        int tabIndex = 1;
         Random r = new Random();
         for (final String movieName : movieNames) {
+            final TextField textField = new TextField();
+            textField.setTabIndex(tabIndex++);
+
             final RatingStars avgRs = new RatingStars();
             avgRs.setMaxValue(10);
             avgRs.setValue(r.nextFloat() * 9 + 1);
             avgRs.setReadOnly(true);
             allRatingStars.add(avgRs);
+            avgRs.setTabIndex(tabIndex++);
 
             final RatingStars yourRs = new RatingStars();
+            yourRs.setTabIndex(tabIndex++);
             yourRs.setMaxValue(10);
             yourRs.setImmediate(true);
             yourRs.addListener(new Property.ValueChangeListener() {
@@ -151,6 +158,7 @@ public class RatingStarsDemo extends Application {
             Object itemId = table.addItem();
             Item i = table.getItem(itemId);
             i.getItemProperty("Movie").setValue(movieName);
+            i.getItemProperty("Comment").setValue(textField);
             i.getItemProperty("Your rating").setValue(yourRs);
             i.getItemProperty("Average rating").setValue(avgRs);
         }

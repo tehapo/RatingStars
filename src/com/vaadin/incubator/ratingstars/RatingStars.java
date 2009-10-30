@@ -1,10 +1,12 @@
-package com.vaadin.incubator.ratingstars.component;
+package com.vaadin.incubator.ratingstars;
 
 import java.util.Map;
 
+import com.vaadin.incubator.ratingstars.gwt.client.ui.VRatingStars;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.ClientWidget;
 
 /**
  * RatingStars is a typical rating component seen in many web applications.
@@ -12,6 +14,7 @@ import com.vaadin.ui.AbstractField;
  * @author Teemu Pöntelin / IT Mill Ltd
  */
 @SuppressWarnings("unchecked")
+@ClientWidget(VRatingStars.class)
 public class RatingStars extends AbstractField implements
         Comparable<RatingStars> {
 
@@ -63,11 +66,6 @@ public class RatingStars extends AbstractField implements
     @Override
     public Class getType() {
         return Double.class;
-    }
-
-    @Override
-    public String getTag() {
-        return "ratingstars";
     }
 
     @Override

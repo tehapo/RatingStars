@@ -1,17 +1,18 @@
-package com.vaadin.incubator.ratingstars.component.gwt.client.ui;
+package com.vaadin.incubator.ratingstars.gwt.client.ui;
 
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.FocusWidget;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
 
-public class VRatingStars extends Widget implements Paintable {
+public class VRatingStars extends FocusWidget implements Paintable {
 
     /** Set the tagname used to statically resolve widget from UIDL. */
     public static final String TAGNAME = "ratingstars";
@@ -37,6 +38,8 @@ public class VRatingStars extends Widget implements Paintable {
     private int width;
 
     private int height;
+
+    private boolean hasFocus;
 
     /** Values from the UIDL */
     private static final String ATTR_MAX_VALUE = "maxValue";
@@ -87,6 +90,9 @@ public class VRatingStars extends Widget implements Paintable {
             sinkEvents(Event.ONCLICK);
             sinkEvents(Event.ONMOUSEOVER);
             sinkEvents(Event.ONMOUSEOUT);
+            sinkEvents(Event.ONFOCUS);
+            sinkEvents(Event.ONBLUR);
+            sinkEvents(Event.ONKEYUP);
         }
 
         if (barDiv == null) {
@@ -136,7 +142,27 @@ public class VRatingStars extends Widget implements Paintable {
             // animate
             setBarWidth(calcBarWidth(value));
             break;
+        case Event.ONFOCUS:
+            hasFocus = true;
+            break;
+        case Event.ONBLUR:
+            hasFocus = false;
+            break;
+        case Event.ONKEYUP:
+            handleKeyUp(event);
+            break;
+        }
+    }
 
+    public void handleKeyUp(Event event) {
+        if (hasFocus) {
+            if (event.getKeyCode() == KeyCodes.KEY_RIGHT) {
+                // TODO: increment currently focused star
+            } else if (event.getKeyCode() == KeyCodes.KEY_LEFT) {
+                // TODO: decrement currently focused star
+            } else if (event.getKeyCode() == KeyCodes.KEY_ENTER) {
+                // TODO: set value of currently focused star
+            }
         }
     }
 

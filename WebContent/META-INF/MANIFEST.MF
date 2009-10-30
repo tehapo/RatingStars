@@ -1,3 +1,9 @@
 Manifest-Version: 1.0
 Class-Path: 
-
+Vaadin-Package-Version: 1
+Implementation-Title: RatingStars
+Implementation-Version: 1.1
+Implementation-Vendor: Teemu Pöntelin / IT Mill Oy
+Vaadin-Widgetsets: com.vaadin.incubator.ratingstars.gwt.RatingStarsWidgetset
+Vaadin-License-Title: Apache2
+Vaadin-License-File: LICENSE.txt

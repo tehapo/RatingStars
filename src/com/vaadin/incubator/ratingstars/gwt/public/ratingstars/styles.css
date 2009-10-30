@@ -35,6 +35,9 @@
 	position: relative;				
 	z-index: 1;			
 }
+.v-ratingstars-star:hover {
+	background-image: url(images/star_19x18_focus.gif);	
+}
 
 /* large */
 .v-ratingstars-wrapper-large .v-ratingstars-bar {

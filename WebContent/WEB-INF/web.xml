@@ -17,7 +17,7 @@
 		<init-param>
 			<description>Application widgetset</description>
 			<param-name>widgetset</param-name>
-			<param-value>com.vaadin.incubator.ratingstars.component.gwt.RatingStarsWidgetset</param-value>
+			<param-value>com.vaadin.incubator.ratingstars.gwt.RatingStarsWidgetset</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>
