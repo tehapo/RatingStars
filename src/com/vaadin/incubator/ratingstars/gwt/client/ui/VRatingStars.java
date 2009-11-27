@@ -8,11 +8,13 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.HasAnimation;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
 
-public class VRatingStars extends FocusWidget implements Paintable {
+public class VRatingStars extends FocusWidget implements Paintable,
+        HasAnimation {
 
     /** Set the tagname used to statically resolve widget from UIDL. */
     public static final String TAGNAME = "ratingstars";
@@ -40,6 +42,10 @@ public class VRatingStars extends FocusWidget implements Paintable {
     private int height;
 
     private boolean hasFocus;
+
+    private Element[] starElements;
+
+    private int kbFocusIndex;
 
     /** Values from the UIDL */
     private static final String ATTR_MAX_VALUE = "maxValue";
@@ -81,10 +87,10 @@ public class VRatingStars extends FocusWidget implements Paintable {
         // Collect the relevant values from UIDL
         maxValue = uidl.getIntAttribute(ATTR_MAX_VALUE);
         value = uidl.getDoubleAttribute(ATTR_VALUE);
-        animated = uidl.getBooleanAttribute(ATTR_ANIMATED);
         immediate = uidl.getBooleanAttribute(ATTR_IMMEDIATE);
         disabled = uidl.getBooleanAttribute(ATTR_DISABLED);
         readonly = uidl.getBooleanAttribute(ATTR_READONLY);
+        setAnimationEnabled(uidl.getBooleanAttribute(ATTR_ANIMATED));
 
         if (!disabled && !readonly) {
             sinkEvents(Event.ONCLICK);
@@ -94,13 +100,15 @@ public class VRatingStars extends FocusWidget implements Paintable {
             sinkEvents(Event.ONBLUR);
             sinkEvents(Event.ONKEYUP);
         } else {
-        	DOM.sinkEvents(getElement(), 0);
+            DOM.sinkEvents(getElement(), 0);
         }
 
         if (barDiv == null) {
             // DOM structure not yet constructed
+            starElements = new Element[maxValue];
             for (int i = 0; i < maxValue; i++) {
                 DivElement starDiv = createStarDiv(i + 1);
+                starElements[i] = starDiv;
                 element.appendChild(starDiv);
                 width += starDiv.getClientWidth();
                 if (height < starDiv.getClientHeight()) {
@@ -128,11 +136,7 @@ public class VRatingStars extends FocusWidget implements Paintable {
         switch (DOM.eventGetType(event)) {
         case Event.ONCLICK:
             // update value
-            if (target.getClassName().equals(STAR_CLASSNAME)) {
-                int ratingValue = target.getPropertyInt("rating");
-                value = ratingValue;
-                client.updateVariable(uidlId, "value", ratingValue, immediate);
-            }
+            setValue(target);
             break;
         case Event.ONMOUSEOVER:
             // animate
@@ -146,9 +150,12 @@ public class VRatingStars extends FocusWidget implements Paintable {
             break;
         case Event.ONFOCUS:
             hasFocus = true;
+            kbFocusIndex = 0;
+            updateKeyboardFocus();
             break;
         case Event.ONBLUR:
             hasFocus = false;
+            removeKeyboardFocus();
             break;
         case Event.ONKEYUP:
             handleKeyUp(event);
@@ -156,14 +163,48 @@ public class VRatingStars extends FocusWidget implements Paintable {
         }
     }
 
+    private void setValue(Element target) {
+        if (target.getClassName().contains(STAR_CLASSNAME)) {
+            int ratingValue = target.getPropertyInt("rating");
+            value = ratingValue;
+            client.updateVariable(uidlId, "value", ratingValue, immediate);
+        }
+    }
+
+    private void removeKeyboardFocus() {
+        starElements[kbFocusIndex].removeClassName(STAR_CLASSNAME + "-focused");
+        if (!hasFocus) {
+            // revert to the current value
+            setBarWidth(calcBarWidth(value));
+        }
+    }
+
+    private void updateKeyboardFocus() {
+        starElements[kbFocusIndex].addClassName(STAR_CLASSNAME + "-focused");
+        setBarWidth(calcBarWidth(starElements[kbFocusIndex]
+                .getPropertyInt("rating")));
+    }
+
     public void handleKeyUp(Event event) {
         if (hasFocus) {
+            int focusChange = 0;
             if (event.getKeyCode() == KeyCodes.KEY_RIGHT) {
-                // TODO: increment currently focused star
+                if (kbFocusIndex < starElements.length - 1) {
+                    focusChange = 1;
+                }
             } else if (event.getKeyCode() == KeyCodes.KEY_LEFT) {
-                // TODO: decrement currently focused star
+                if (kbFocusIndex > 0) {
+                    focusChange = -1;
+                }
             } else if (event.getKeyCode() == KeyCodes.KEY_ENTER) {
-                // TODO: set value of currently focused star
+                setValue(starElements[kbFocusIndex]);
+            }
+
+            // update keyboard focus value
+            if (focusChange != 0) {
+                removeKeyboardFocus();
+                kbFocusIndex += focusChange;
+                updateKeyboardFocus();
             }
         }
     }
@@ -191,7 +232,7 @@ public class VRatingStars extends FocusWidget implements Paintable {
             return;
         }
 
-        if (!animated) {
+        if (!isAnimationEnabled()) {
             barDiv.getStyle().setProperty("width", widthPercentage + "%");
         } else {
             String currentWidth = barDiv.getStyle().getProperty("width");
@@ -231,6 +272,16 @@ public class VRatingStars extends FocusWidget implements Paintable {
         starDiv.setClassName(STAR_CLASSNAME);
         starDiv.setPropertyInt("rating", rating);
         return starDiv;
+    }
+
+    @Override
+    public boolean isAnimationEnabled() {
+        return animated;
+    }
+
+    @Override
+    public void setAnimationEnabled(boolean enable) {
+        this.animated = enable;
     }
 
 }

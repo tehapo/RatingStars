@@ -35,7 +35,8 @@
 	position: relative;				
 	z-index: 1;			
 }
-.v-ratingstars-star:hover {
+.v-ratingstars-star:hover,
+.v-ratingstars-star-focused {
 	background-image: url(images/star_19x18_focus.gif);	
 }
 

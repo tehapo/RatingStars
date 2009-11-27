@@ -119,21 +119,17 @@ public class RatingStarsDemo extends Application {
      * Populate the table with some random data.
      */
     private void populateTable() {
-        int tabIndex = 1;
         Random r = new Random();
         for (final String movieName : movieNames) {
             final TextField textField = new TextField();
-            textField.setTabIndex(tabIndex++);
 
             final RatingStars avgRs = new RatingStars();
             avgRs.setMaxValue(10);
             avgRs.setValue(r.nextFloat() * 9 + 1);
             avgRs.setReadOnly(true);
             allRatingStars.add(avgRs);
-            avgRs.setTabIndex(tabIndex++);
 
             final RatingStars yourRs = new RatingStars();
-            yourRs.setTabIndex(tabIndex++);
             yourRs.setMaxValue(10);
             yourRs.setImmediate(true);
             yourRs.addListener(new Property.ValueChangeListener() {
