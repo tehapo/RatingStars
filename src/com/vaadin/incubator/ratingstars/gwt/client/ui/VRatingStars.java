@@ -101,6 +101,7 @@ public class VRatingStars extends FocusWidget implements Paintable,
             sinkEvents(Event.ONKEYUP);
         } else {
             DOM.sinkEvents(getElement(), 0);
+            setTabIndex(-1);
         }
 
         if (barDiv == null) {
