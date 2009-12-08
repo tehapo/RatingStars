@@ -173,7 +173,9 @@ public class VRatingStars extends FocusWidget implements Paintable,
     }
 
     private void removeKeyboardFocus() {
-        starElements[kbFocusIndex].removeClassName(STAR_CLASSNAME + "-focused");
+        String className = starElements[kbFocusIndex].getClassName();
+        className = className.replaceAll(STAR_CLASSNAME + "-focused", "");
+        starElements[kbFocusIndex].setClassName(className);
         if (!hasFocus) {
             // revert to the current value
             setBarWidth(calcBarWidth(value));
@@ -181,7 +183,11 @@ public class VRatingStars extends FocusWidget implements Paintable,
     }
 
     private void updateKeyboardFocus() {
-        starElements[kbFocusIndex].addClassName(STAR_CLASSNAME + "-focused");
+        String className = starElements[kbFocusIndex].getClassName();
+        if (!className.contains(STAR_CLASSNAME + "-focused")) {
+            starElements[kbFocusIndex].setClassName(className + " "
+                    + STAR_CLASSNAME + "-focused");
+        }
         setBarWidth(calcBarWidth(starElements[kbFocusIndex]
                 .getPropertyInt("rating")));
     }
