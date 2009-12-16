@@ -47,6 +47,8 @@ public class VRatingStars extends FocusWidget implements Paintable,
 
     private int kbFocusIndex;
 
+    private boolean mouseDown;
+
     /** Values from the UIDL */
     private static final String ATTR_MAX_VALUE = "maxValue";
     private static final String ATTR_VALUE = "value";
@@ -86,14 +88,15 @@ public class VRatingStars extends FocusWidget implements Paintable,
 
         // Collect the relevant values from UIDL
         maxValue = uidl.getIntAttribute(ATTR_MAX_VALUE);
-        value = uidl.getDoubleAttribute(ATTR_VALUE);
         immediate = uidl.getBooleanAttribute(ATTR_IMMEDIATE);
         disabled = uidl.getBooleanAttribute(ATTR_DISABLED);
         readonly = uidl.getBooleanAttribute(ATTR_READONLY);
         setAnimationEnabled(uidl.getBooleanAttribute(ATTR_ANIMATED));
+        value = uidl.getDoubleVariable(ATTR_VALUE);
 
         if (!disabled && !readonly) {
-            sinkEvents(Event.ONCLICK);
+            sinkEvents(Event.ONMOUSEUP);
+            sinkEvents(Event.ONMOUSEDOWN);
             sinkEvents(Event.ONMOUSEOVER);
             sinkEvents(Event.ONMOUSEOUT);
             sinkEvents(Event.ONFOCUS);
@@ -135,13 +138,18 @@ public class VRatingStars extends FocusWidget implements Paintable,
 
         Element target = Element.as(event.getEventTarget());
         switch (DOM.eventGetType(event)) {
-        case Event.ONCLICK:
+        case Event.ONMOUSEUP:
             // update value
             setValue(target);
+            setFocus(false);
+            mouseDown = false;
+            break;
+        case Event.ONMOUSEDOWN:
+            mouseDown = true;
             break;
         case Event.ONMOUSEOVER:
             // animate
-            if (target.getClassName().equals(STAR_CLASSNAME)) {
+            if (target.getClassName().contains(STAR_CLASSNAME)) {
                 setBarWidth(calcBarWidth(target.getPropertyInt("rating")));
             }
             break;
@@ -151,8 +159,16 @@ public class VRatingStars extends FocusWidget implements Paintable,
             break;
         case Event.ONFOCUS:
             hasFocus = true;
-            kbFocusIndex = 0;
-            updateKeyboardFocus();
+            if (!mouseDown) {
+                if (Math.round(value) > 0) {
+                    // focus the current value (or the closest int)
+                    kbFocusIndex = (int) (Math.round(value) - 1);
+                } else {
+                    // focus the first
+                    kbFocusIndex = 0;
+                }
+                updateKeyboardFocus();
+            }
             break;
         case Event.ONBLUR:
             hasFocus = false;
@@ -174,7 +190,8 @@ public class VRatingStars extends FocusWidget implements Paintable,
 
     private void removeKeyboardFocus() {
         String className = starElements[kbFocusIndex].getClassName();
-        className = className.replaceAll(STAR_CLASSNAME + "-focused", "");
+        className = className.replaceAll(STAR_CLASSNAME + "-focused", "")
+                .trim();
         starElements[kbFocusIndex].setClassName(className);
         if (!hasFocus) {
             // revert to the current value

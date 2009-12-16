@@ -72,8 +72,10 @@ public class RatingStars extends AbstractField implements
     public void paintContent(PaintTarget target) throws PaintException {
         super.paintContent(target);
         target.addAttribute("maxValue", maxValue);
-        target.addAttribute("value", Double.valueOf(getValue().toString()));
         target.addAttribute("animated", animated);
+        target
+                .addVariable(this, "value", Double.valueOf(getValue()
+                        .toString()));
     }
 
     @Override
