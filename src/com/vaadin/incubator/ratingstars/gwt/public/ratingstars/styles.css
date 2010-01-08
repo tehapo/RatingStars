@@ -6,10 +6,13 @@
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 }
+.v-ratingstars-wrapper-focus {
+	border-color: #3b5a75 #4b7192 #507596;
+}
 .v-ratingstars {
 	float: left;
 	position: relative;
-	background: #fafafa;
+	background: #efefef;
 	overflow: hidden;
 	cursor: pointer;
 }
@@ -26,26 +29,31 @@
 	left: -1px;
 }
 .v-ratingstars-star {
-	background-image: url(images/star_19x18.gif);
+	background-image: url(images/star_19x18.png);
 	background-position: top left;
 	background-repeat: no-repeat;
 	width: 19px;
-	height: 18px;	
+	height: 18px;
 	float: left;	
 	position: relative;				
-	z-index: 1;			
+	z-index: 1;	
+	overflow: hidden;		
 }
-.v-ratingstars-star:hover,
-.v-ratingstars-star-focused {
-	background-image: url(images/star_19x18_focus.gif);	
+.v-ie6 .v-ratingstars-star {
+	/* gif instead of png for IE6 */
+	background-image: url(images/star_19x18.gif);
 }
 
-/* large */
-.v-ratingstars-wrapper-large .v-ratingstars-bar {
-	background-image: url(images/star_bg_34x33.gif);
+/* tiny */
+.v-ratingstars-wrapper-tiny .v-ratingstars-bar {
+	background-image: url(images/star_bg_12x11.gif);
 }
-.v-ratingstars-wrapper-large .v-ratingstars-star {
-	background-image: url(images/star_34x33.gif);
-	width: 34px;
-	height: 33px;
+.v-ratingstars-wrapper-tiny .v-ratingstars-star {
+	background-image: url(images/star_12x11.png);
+	width: 12px;
+	height: 11px;
+}
+.v-ie6 .v-ratingstars-wrapper-tiny .v-ratingstars-star {
+	/* gif instead of png for IE6 */
+	background-image: url(images/star_12x11.gif);
 }

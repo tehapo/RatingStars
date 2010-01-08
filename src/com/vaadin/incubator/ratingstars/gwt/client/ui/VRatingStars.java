@@ -1,6 +1,7 @@
 package com.vaadin.incubator.ratingstars.gwt.client.ui;
 
 import com.google.gwt.animation.client.Animation;
+import com.google.gwt.core.client.impl.StringBuilderImpl;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -13,6 +14,28 @@ import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
 
+/**
+ * VRatingStars is the client-side implementation of the RatingStars component.
+ * 
+ * The DOM structure is as follows:
+ * 
+ * <pre>
+ *    div.v-ratingstars-wrapper
+ *        div.v-ratingstars
+ *            div.v-ratingstars-star
+ *            div.v-ratingstars-star
+ *            div.v-ratingstars-star
+ *            ...
+ *            div.v-ratingstars-star
+ *            div.v-ratingstars-bar
+ * </pre>
+ * 
+ * The main idea is that .v-ratingstars-star elements have a partially
+ * transparent background image and the width of the .v-ratingstars-bar element
+ * behind these star elements is changed according to the current value.
+ * 
+ * @author Teemu Pöntelin / IT Mill Ltd
+ */
 public class VRatingStars extends FocusWidget implements Paintable,
         HasAnimation {
 
@@ -41,13 +64,9 @@ public class VRatingStars extends FocusWidget implements Paintable,
 
     private int height;
 
-    private boolean hasFocus;
-
     private Element[] starElements;
 
-    private int kbFocusIndex;
-
-    private boolean mouseDown;
+    private int focusIndex = -1;
 
     /** Values from the UIDL */
     private static final String ATTR_MAX_VALUE = "maxValue";
@@ -95,8 +114,7 @@ public class VRatingStars extends FocusWidget implements Paintable,
         value = uidl.getDoubleVariable(ATTR_VALUE);
 
         if (!disabled && !readonly) {
-            sinkEvents(Event.ONMOUSEUP);
-            sinkEvents(Event.ONMOUSEDOWN);
+            sinkEvents(Event.ONCLICK);
             sinkEvents(Event.ONMOUSEOVER);
             sinkEvents(Event.ONMOUSEOUT);
             sinkEvents(Event.ONFOCUS);
@@ -138,45 +156,65 @@ public class VRatingStars extends FocusWidget implements Paintable,
 
         Element target = Element.as(event.getEventTarget());
         switch (DOM.eventGetType(event)) {
-        case Event.ONMOUSEUP:
+        case Event.ONCLICK:
             // update value
             setValue(target);
-            setFocus(false);
-            mouseDown = false;
-            break;
-        case Event.ONMOUSEDOWN:
-            mouseDown = true;
             break;
         case Event.ONMOUSEOVER:
             // animate
             if (target.getClassName().contains(STAR_CLASSNAME)) {
-                setBarWidth(calcBarWidth(target.getPropertyInt("rating")));
+                int rating = target.getPropertyInt("rating");
+                setFocusIndex(rating - 1);
             }
+            setFocus(true);
             break;
         case Event.ONMOUSEOUT:
-            // animate
             setBarWidth(calcBarWidth(value));
+            setFocusIndex(-1);
             break;
         case Event.ONFOCUS:
-            hasFocus = true;
-            if (!mouseDown) {
+            addClassName(getElement(), WRAPPER_CLASSNAME + "-focus");
+            if (focusIndex < 0) {
                 if (Math.round(value) > 0) {
                     // focus the current value (or the closest int)
-                    kbFocusIndex = (int) (Math.round(value) - 1);
+                    setFocusIndex((int) (Math.round(value) - 1));
                 } else {
-                    // focus the first
-                    kbFocusIndex = 0;
+                    // focus the first value
+                    setFocusIndex(0);
                 }
-                updateKeyboardFocus();
             }
             break;
         case Event.ONBLUR:
-            hasFocus = false;
-            removeKeyboardFocus();
+            removeClassName(getElement(), WRAPPER_CLASSNAME + "-focus");
+            setFocusIndex(-1);
+            setBarWidth(calcBarWidth(value));
             break;
         case Event.ONKEYUP:
             handleKeyUp(event);
             break;
+        }
+    }
+
+    private void setFocusIndex(int index) {
+        // remove old focus class
+        if (focusIndex >= 0 && focusIndex < starElements.length) {
+            removeClassName(starElements[focusIndex], STAR_CLASSNAME + "-focus");
+        }
+        // update focusIndex and add class
+        focusIndex = index;
+        if (focusIndex >= 0 && focusIndex < starElements.length) {
+            addClassName(starElements[focusIndex], STAR_CLASSNAME + "-focus");
+            setBarWidth(calcBarWidth(starElements[focusIndex]
+                    .getPropertyInt("rating")));
+        }
+    }
+
+    private void changeFocusIndex(int delta) {
+        int newFocusIndex = focusIndex + delta;
+
+        // check for boundaries
+        if (newFocusIndex >= 0 && newFocusIndex < starElements.length) {
+            setFocusIndex(newFocusIndex);
         }
     }
 
@@ -188,48 +226,35 @@ public class VRatingStars extends FocusWidget implements Paintable,
         }
     }
 
-    private void removeKeyboardFocus() {
-        String className = starElements[kbFocusIndex].getClassName();
-        className = className.replaceAll(STAR_CLASSNAME + "-focused", "")
-                .trim();
-        starElements[kbFocusIndex].setClassName(className);
-        if (!hasFocus) {
-            // revert to the current value
-            setBarWidth(calcBarWidth(value));
+    private void addClassName(Element element, String className) {
+        String currentClassName = element.getClassName();
+        if (!currentClassName.contains(className)) {
+            String newClassName = currentClassName + " " + className;
+            element.setClassName(newClassName.trim());
         }
     }
 
-    private void updateKeyboardFocus() {
-        String className = starElements[kbFocusIndex].getClassName();
-        if (!className.contains(STAR_CLASSNAME + "-focused")) {
-            starElements[kbFocusIndex].setClassName(className + " "
-                    + STAR_CLASSNAME + "-focused");
+    private void removeClassName(Element element, String classNameToRemove) {
+        String currentClassName = element.getClassName();
+        if (currentClassName.contains(classNameToRemove)) {
+            String[] classNames = currentClassName.split(" ");
+            StringBuilderImpl newClassName = new StringBuilderImpl();
+            for (String className : classNames) {
+                if (!className.equals(classNameToRemove)) {
+                    newClassName.append(className + " ");
+                }
+            }
+            element.setClassName(newClassName.toString().trim());
         }
-        setBarWidth(calcBarWidth(starElements[kbFocusIndex]
-                .getPropertyInt("rating")));
     }
 
     public void handleKeyUp(Event event) {
-        if (hasFocus) {
-            int focusChange = 0;
-            if (event.getKeyCode() == KeyCodes.KEY_RIGHT) {
-                if (kbFocusIndex < starElements.length - 1) {
-                    focusChange = 1;
-                }
-            } else if (event.getKeyCode() == KeyCodes.KEY_LEFT) {
-                if (kbFocusIndex > 0) {
-                    focusChange = -1;
-                }
-            } else if (event.getKeyCode() == KeyCodes.KEY_ENTER) {
-                setValue(starElements[kbFocusIndex]);
-            }
-
-            // update keyboard focus value
-            if (focusChange != 0) {
-                removeKeyboardFocus();
-                kbFocusIndex += focusChange;
-                updateKeyboardFocus();
-            }
+        if (event.getKeyCode() == KeyCodes.KEY_RIGHT) {
+            changeFocusIndex(+1);
+        } else if (event.getKeyCode() == KeyCodes.KEY_LEFT) {
+            changeFocusIndex(-1);
+        } else if (event.getKeyCode() == KeyCodes.KEY_ENTER) {
+            setValue(starElements[focusIndex]);
         }
     }
 
@@ -246,6 +271,7 @@ public class VRatingStars extends FocusWidget implements Paintable,
         barDiv.getStyle().setPropertyPx("height", height);
         return barDiv;
     }
+
 
     /**
      * Sets the width of the bar div instantly or via animated progress

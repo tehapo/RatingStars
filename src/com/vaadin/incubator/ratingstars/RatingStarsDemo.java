@@ -84,15 +84,15 @@ public class RatingStarsDemo extends Application {
         defaultRs.setCaption("default");
         allRatingStars.add(defaultRs);
 
-        RatingStars largeRs = new RatingStars();
-        largeRs.setStyleName("large");
-        largeRs.setCaption("large");
-        allRatingStars.add(largeRs);
+        RatingStars tinyRs = new RatingStars();
+        tinyRs.setStyleName("tiny");
+        tinyRs.setCaption("tiny");
+        allRatingStars.add(tinyRs);
 
         HorizontalLayout themeLayout = new HorizontalLayout();
         themeLayout.setSpacing(true);
         themeLayout.addComponent(defaultRs);
-        themeLayout.addComponent(largeRs);
+        themeLayout.addComponent(tinyRs);
         mainLayout.addComponent(themeLayout);
 
         // component states
