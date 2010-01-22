@@ -272,7 +272,6 @@ public class VRatingStars extends FocusWidget implements Paintable,
         return barDiv;
     }
 
-
     /**
      * Sets the width of the bar div instantly or via animated progress
      * depending on the value of the <code>animated</code> property.
@@ -324,12 +323,10 @@ public class VRatingStars extends FocusWidget implements Paintable,
         return starDiv;
     }
 
-    @Override
     public boolean isAnimationEnabled() {
         return animated;
     }
 
-    @Override
     public void setAnimationEnabled(boolean enable) {
         this.animated = enable;
     }

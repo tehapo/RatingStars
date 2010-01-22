@@ -92,7 +92,6 @@ public class RatingStars extends AbstractField implements
         }
     }
 
-    @Override
     public int compareTo(RatingStars o) {
         return ((Double) this.getValue()).compareTo((Double) o.getValue());
     }
