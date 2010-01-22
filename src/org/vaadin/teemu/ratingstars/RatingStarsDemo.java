@@ -1,4 +1,4 @@
-package com.vaadin.incubator.ratingstars;
+package org.vaadin.teemu.ratingstars;
 
 import java.util.HashSet;
 import java.util.Random;

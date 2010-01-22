@@ -1,8 +1,7 @@
-package com.vaadin.incubator.ratingstars;
+package org.vaadin.teemu.ratingstars;
 
 import java.util.Map;
 
-import com.vaadin.incubator.ratingstars.gwt.client.ui.VRatingStars;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.AbstractField;
@@ -14,7 +13,7 @@ import com.vaadin.ui.ClientWidget;
  * @author Teemu Pöntelin / IT Mill Ltd
  */
 @SuppressWarnings("unchecked")
-@ClientWidget(VRatingStars.class)
+@ClientWidget(org.vaadin.teemu.ratingstars.gwt.client.ui.VRatingStars.class)
 public class RatingStars extends AbstractField implements
         Comparable<RatingStars> {
 

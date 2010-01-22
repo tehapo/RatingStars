@@ -1,4 +1,4 @@
-package com.vaadin.incubator.ratingstars.gwt.client.ui;
+package org.vaadin.teemu.ratingstars.gwt.client.ui;
 
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.core.client.impl.StringBuilderImpl;
