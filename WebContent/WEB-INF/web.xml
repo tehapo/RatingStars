@@ -12,12 +12,12 @@
 		<init-param>
 			<description>Vaadin application class to start</description>
 			<param-name>application</param-name>
-			<param-value>com.vaadin.incubator.ratingstars.RatingStarsDemo</param-value>
+			<param-value>org.vaadin.teemu.ratingstars.RatingStarsDemo</param-value>
 		</init-param>
 		<init-param>
 			<description>Application widgetset</description>
 			<param-name>widgetset</param-name>
-			<param-value>com.vaadin.incubator.ratingstars.gwt.RatingStarsWidgetset</param-value>
+			<param-value>org.vaadin.teemu.ratingstars.gwt.RatingStarsWidgetset</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>
