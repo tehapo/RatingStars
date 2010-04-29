@@ -1,5 +1,6 @@
 package org.vaadin.teemu.ratingstars;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.vaadin.terminal.PaintException;
@@ -22,6 +23,8 @@ public class RatingStars extends AbstractField implements
     private int maxValue = 5;
 
     private boolean animated = true;
+
+    private Map<Integer, String> valueCaptions = new HashMap<Integer, String>();
 
     /**
      * Constructs a new animated RatingStars component with default value of 0.0
@@ -72,6 +75,7 @@ public class RatingStars extends AbstractField implements
         super.paintContent(target);
         target.addAttribute("maxValue", maxValue);
         target.addAttribute("animated", animated);
+        target.addAttribute("valueCaptions", valueCaptions);
         target
                 .addVariable(this, "value", Double.valueOf(getValue()
                         .toString()));
@@ -93,6 +97,10 @@ public class RatingStars extends AbstractField implements
 
     public int compareTo(RatingStars o) {
         return ((Double) this.getValue()).compareTo((Double) o.getValue());
+    }
+
+    public void setValueCaption(int value, String captionForValue) {
+        valueCaptions.put(value, captionForValue);
     }
 
 }

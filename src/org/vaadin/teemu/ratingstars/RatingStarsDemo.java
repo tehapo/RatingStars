@@ -132,6 +132,10 @@ public class RatingStarsDemo extends Application {
             final RatingStars yourRs = new RatingStars();
             yourRs.setMaxValue(10);
             yourRs.setImmediate(true);
+            yourRs.setDescription("Your rating");
+            yourRs.setValueCaption(1, "Crap");
+            yourRs.setValueCaption(5, "OK");
+            yourRs.setValueCaption(10, "Excellent");
             yourRs.addListener(new Property.ValueChangeListener() {
 
                 private static final long serialVersionUID = -3277119031169194273L;
@@ -142,6 +146,9 @@ public class RatingStarsDemo extends Application {
                     RatingStarsDemo.this.getMainWindow().showNotification(
                             "You voted " + value + " stars for " + movieName
                                     + ".");
+
+                    ((RatingStars) event.getProperty()).setValueCaption(
+                            (int) Math.round(value), "Your Rating");
 
                     // dummy logic to calculate "average" value
                     avgRs.setReadOnly(false);
