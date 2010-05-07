@@ -99,8 +99,29 @@ public class RatingStars extends AbstractField implements
         return ((Double) this.getValue()).compareTo((Double) o.getValue());
     }
 
+    /**
+     * Sets the caption as the displayed description of the given rating value.
+     * 
+     * @param value
+     * @param captionForValue
+     * @see #setValueCaption(String...)
+     */
     public void setValueCaption(int value, String captionForValue) {
         valueCaptions.put(value, captionForValue);
+    }
+
+    /**
+     * Sets all given captions as displayed descriptions for rating values in
+     * sequence starting from 1.
+     * 
+     * @param captionsForValues
+     * @see #setValueCaption(int, String)
+     */
+    public void setValueCaption(String... captionsForValues) {
+        int value = 1;
+        for (String caption : captionsForValues) {
+            valueCaptions.put(value++, caption);
+        }
     }
 
 }

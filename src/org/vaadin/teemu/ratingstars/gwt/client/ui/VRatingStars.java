@@ -4,14 +4,12 @@ import com.google.gwt.animation.client.Animation;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HasAnimation;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
-import com.vaadin.terminal.gwt.client.BrowserInfo;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
 import com.vaadin.terminal.gwt.client.ValueMap;
@@ -49,7 +47,6 @@ public class VRatingStars extends FocusWidget implements Paintable,
     public static final String STAR_CLASSNAME = CLASSNAME + "-star";
     public static final String BAR_CLASSNAME = CLASSNAME + "-bar";
     public static final String WRAPPER_CLASSNAME = CLASSNAME + "-wrapper";
-    public static final String STAR_CAPTION_ID = STAR_CLASSNAME + "-caption";
 
     private static final int ANIMATION_DURATION_IN_MS = 150;
 
@@ -62,8 +59,6 @@ public class VRatingStars extends FocusWidget implements Paintable,
     private Element barDiv;
 
     private Element element;
-
-    private Element starCaption;
 
     private int width;
 
@@ -139,7 +134,6 @@ public class VRatingStars extends FocusWidget implements Paintable,
 
             barDiv = createBarDiv(height);
             element.appendChild(barDiv);
-            starCaption = getStarCaption();
         } else {
             setBarWidth(calcBarWidth(value));
         }
@@ -148,12 +142,23 @@ public class VRatingStars extends FocusWidget implements Paintable,
 
     private void updateValueCaptions(ValueMap valueCaptions) {
         for (Element starElement : starElements) {
-            String caption = valueCaptions.getString(Integer
-                    .toString(starElement.getPropertyInt("rating")));
+            int rating = starElement.getPropertyInt("rating");
+            String caption = valueCaptions.getString(Integer.toString(rating));
             if (caption != null) {
                 starElement.setPropertyString("caption", caption);
+
+                String captionId = getCaptionId(rating);
+                if (VStarCaption.isVisibleForCaptionId(captionId)) {
+                    // update currently visible caption
+                    VStarCaption.showAroundElement(starElement, caption,
+                            captionId);
+                }
             }
         }
+    }
+
+    private String getCaptionId(int rating) {
+        return uidlId + "-" + rating;
     }
 
     private void createStarElements() {
@@ -197,13 +202,15 @@ public class VRatingStars extends FocusWidget implements Paintable,
                 int rating = target.getPropertyInt("rating");
                 setFocusIndex(rating - 1);
                 setFocus(true);
-                displayStarCaption(target);
+                VStarCaption.showAroundElement(target, target
+                        .getPropertyString("caption"), getCaptionId(target
+                        .getPropertyInt("rating")));
             }
             break;
         case Event.ONMOUSEOUT:
             setBarWidth(calcBarWidth(value));
             setFocusIndex(-1);
-            hideStarCaption();
+            VStarCaption.hide();
             break;
         case Event.ONFOCUS:
             addClassName(getElement(), WRAPPER_CLASSNAME + "-focus");
@@ -221,51 +228,12 @@ public class VRatingStars extends FocusWidget implements Paintable,
             removeClassName(getElement(), WRAPPER_CLASSNAME + "-focus");
             setFocusIndex(-1);
             setBarWidth(calcBarWidth(value));
-            hideStarCaption();
+            VStarCaption.hide();
             break;
         case Event.ONKEYUP:
             handleKeyUp(event);
             break;
         }
-    }
-
-    private void displayStarCaption(Element target) {
-        String caption = target.getPropertyString("caption");
-        if (caption != null) {
-            // set the text and display element (to get width for calculations)
-            starCaption.getElementsByTagName("span").getItem(0).setInnerText(
-                    caption);
-            Style starCaptionStyle = starCaption.getStyle();
-            starCaptionStyle.setProperty("display", "block");
-
-            if (BrowserInfo.get().isIE6()) {
-                // IE6 workaround for styling inner element positioning, set the
-                // width explicitly.
-                starCaption.getStyle().setProperty("width", "auto");
-                starCaption.getStyle().setProperty("width",
-                        starCaption.getClientWidth() + "px");
-            }
-
-            // calculate position
-            int x = target.getAbsoluteLeft();
-            x += (target.getClientWidth() / 2);
-            x -= (starCaption.getClientWidth() / 2);
-            int y = target.getAbsoluteTop();
-            y += target.getClientHeight();
-
-            // position the element
-            starCaptionStyle.setProperty("left", x + "px");
-            starCaptionStyle.setProperty("top", y + "px");
-        } else {
-            hideStarCaption();
-        }
-    }
-
-    private void hideStarCaption() {
-        Style starCaptionStyle = starCaption.getStyle();
-        starCaptionStyle.setProperty("display", "none");
-        starCaptionStyle.setProperty("left", "-100px");
-        starCaptionStyle.setProperty("top", "-100px");
     }
 
     private void setFocusIndex(int index) {
@@ -276,10 +244,13 @@ public class VRatingStars extends FocusWidget implements Paintable,
         // update focusIndex and add class
         focusIndex = index;
         if (focusIndex >= 0 && focusIndex < starElements.length) {
-            addClassName(starElements[focusIndex], STAR_CLASSNAME + "-focus");
-            setBarWidth(calcBarWidth(starElements[focusIndex]
+            Element focusedStar = starElements[focusIndex];
+
+            addClassName(focusedStar, STAR_CLASSNAME + "-focus");
+            setBarWidth(calcBarWidth(focusedStar.getPropertyInt("rating")));
+            VStarCaption.showAroundElement(focusedStar, focusedStar
+                    .getPropertyString("caption"), getCaptionId(focusedStar
                     .getPropertyInt("rating")));
-            displayStarCaption(starElements[focusIndex]);
         }
     }
 
@@ -344,27 +315,6 @@ public class VRatingStars extends FocusWidget implements Paintable,
         barDiv.getStyle().setProperty("width", calcBarWidth(value) + "%");
         barDiv.getStyle().setPropertyPx("height", height);
         return barDiv;
-    }
-
-    private Element getStarCaption() {
-        Document doc = Document.get();
-        Element starCaption = doc.getElementById(STAR_CAPTION_ID);
-        if (starCaption == null) {
-            // caption element doesn't yet exist -> create
-            starCaption = doc.createDivElement();
-
-            Element starCaptionDecoration = doc.createDivElement();
-            starCaption.appendChild(starCaptionDecoration);
-
-            Element starCaptionSpan = doc.createSpanElement();
-            starCaptionSpan.setInnerText("-- caption --");
-
-            starCaption.setId(STAR_CAPTION_ID);
-            starCaption.getStyle().setProperty("display", "none");
-            starCaption.appendChild(starCaptionSpan);
-            doc.getBody().appendChild(starCaption);
-        }
-        return starCaption;
     }
 
     /**

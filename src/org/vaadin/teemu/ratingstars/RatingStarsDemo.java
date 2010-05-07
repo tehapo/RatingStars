@@ -1,6 +1,8 @@
 package org.vaadin.teemu.ratingstars;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -8,15 +10,18 @@ import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Window.Notification;
 
 /**
  * A demo application for the RatingStars component. For a live demo see
@@ -30,25 +35,74 @@ public class RatingStarsDemo extends Application {
 
     private Table table;
 
-    private VerticalLayout mainLayout;
-
     private Set<RatingStars> allRatingStars = new HashSet<RatingStars>();
 
     private CheckBox animatedCheckBox;
 
-    private String[] movieNames = { "The Matrix", "The Matrix Reloaded",
-            "The Matrix Revolutions", "Memento", "Kill Bill: Vol. 1",
-            "Kill Bill: Vol. 2", "District 9" };
+    private Window mainWindow;
+
+    private Panel mainPanel;
+
+    private String[] movieNames = { "The Matrix", "Memento",
+            "Kill Bill: Vol. 1" };
+
+    private static Map<Integer, String> valueCaptions = new HashMap<Integer, String>(
+            5);
+
+    static {
+        valueCaptions.put(1, "Epic Fail");
+        valueCaptions.put(2, "Poor");
+        valueCaptions.put(3, "OK");
+        valueCaptions.put(4, "Good");
+        valueCaptions.put(5, "Excellent");
+    }
 
     @Override
     public void init() {
-        // set up the main window and main layout
-        final Window mainWindow = new Window("RatingStarsDemoApplication");
+        initWindowAndDescription();
+        initDemoPanel();
+    }
+
+    private void initWindowAndDescription() {
+        mainWindow = new Window("RatingStars Component Demo");
         setMainWindow(mainWindow);
-        mainLayout = new VerticalLayout();
-        mainLayout.setMargin(true);
-        mainLayout.setSpacing(true);
-        mainWindow.setContent(mainLayout);
+
+        VerticalLayout centerLayout = new VerticalLayout();
+        centerLayout.setMargin(true);
+
+        mainPanel = new Panel();
+        mainPanel.setWidth("750px");
+        centerLayout.addComponent(mainPanel);
+        centerLayout.setComponentAlignment(mainPanel, Alignment.TOP_CENTER);
+        mainWindow.setContent(centerLayout);
+
+        StringBuilder descriptionXhtml = new StringBuilder();
+        descriptionXhtml.append("<h1>RatingStars Component Demo</h1>");
+        descriptionXhtml
+                .append("<p>RatingStars is a simple component for giving rating values.</p>");
+        descriptionXhtml
+                .append("<p>Download and rate this component at <a href=\"http://vaadin.com/directory#addon/20\">Vaadin Directory</a>.</p>");
+        descriptionXhtml.append("<p>Highlights:</p>");
+        descriptionXhtml.append("<ul>");
+        descriptionXhtml
+                .append("<li>Keyboard usage (focus with tab, navigate with arrow keys, select with enter)</li>");
+        descriptionXhtml.append("<li>Easily customizable appearance</li>");
+        descriptionXhtml.append("<li>Captions for individual values</li>");
+        descriptionXhtml.append("<li>Optional transition animations</li>");
+        descriptionXhtml.append("</ul>");
+
+        Label description = new Label(descriptionXhtml.toString(),
+                Label.CONTENT_XHTML);
+        mainPanel.addComponent(description);
+    }
+
+    private void initDemoPanel() {
+        Panel demoPanel = new Panel("Demonstration");
+        VerticalLayout demoLayout = new VerticalLayout();
+        demoLayout.setSpacing(true);
+        demoLayout.setMargin(true);
+        demoPanel.setContent(demoLayout);
+        mainPanel.addComponent(demoPanel);
 
         // animated checkbox
         animatedCheckBox = new CheckBox("Animated?");
@@ -64,7 +118,7 @@ public class RatingStarsDemo extends Application {
                 }
             }
         });
-        mainLayout.addComponent(animatedCheckBox);
+        demoLayout.addComponent(animatedCheckBox);
 
         // create and populate the movie table
         table = new Table("Rate your favourite movies");
@@ -74,10 +128,10 @@ public class RatingStarsDemo extends Application {
         table.addContainerProperty("Average rating", RatingStars.class, null);
         populateTable();
         table.setPageLength(table.getItemIds().size());
-        mainLayout.addComponent(table);
+        demoLayout.addComponent(table);
 
         // theme demos
-        mainLayout.addComponent(new Label("<div style=\"margin-top: 20px\">"
+        demoLayout.addComponent(new Label("<div style=\"margin-top: 20px\">"
                 + "The component has two built-in styles.</div>",
                 Label.CONTENT_XHTML));
         RatingStars defaultRs = new RatingStars();
@@ -93,10 +147,10 @@ public class RatingStarsDemo extends Application {
         themeLayout.setSpacing(true);
         themeLayout.addComponent(defaultRs);
         themeLayout.addComponent(tinyRs);
-        mainLayout.addComponent(themeLayout);
+        demoLayout.addComponent(themeLayout);
 
         // component states
-        mainLayout.addComponent(new Label("<div style=\"margin-top: 20px\">"
+        demoLayout.addComponent(new Label("<div style=\"margin-top: 20px\">"
                 + "Component states</div>", Label.CONTENT_XHTML));
         RatingStars disabledRs = new RatingStars();
         disabledRs.setCaption("disabled");
@@ -112,7 +166,7 @@ public class RatingStarsDemo extends Application {
         stateLayout.setSpacing(true);
         stateLayout.addComponent(disabledRs);
         stateLayout.addComponent(readonlyRs);
-        mainLayout.addComponent(stateLayout);
+        demoLayout.addComponent(stateLayout);
     }
 
     /**
@@ -124,18 +178,17 @@ public class RatingStarsDemo extends Application {
             final TextField textField = new TextField();
 
             final RatingStars avgRs = new RatingStars();
-            avgRs.setMaxValue(10);
-            avgRs.setValue(r.nextFloat() * 9 + 1);
+            avgRs.setMaxValue(5);
+            avgRs.setValue(r.nextFloat() * 4 + 1);
             avgRs.setReadOnly(true);
             allRatingStars.add(avgRs);
 
             final RatingStars yourRs = new RatingStars();
-            yourRs.setMaxValue(10);
+            yourRs.setMaxValue(5);
             yourRs.setImmediate(true);
             yourRs.setDescription("Your rating");
-            yourRs.setValueCaption(1, "Crap");
-            yourRs.setValueCaption(5, "OK");
-            yourRs.setValueCaption(10, "Excellent");
+            yourRs.setValueCaption(valueCaptions.values()
+                    .toArray(new String[5]));
             yourRs.addListener(new Property.ValueChangeListener() {
 
                 private static final long serialVersionUID = -3277119031169194273L;
@@ -145,10 +198,15 @@ public class RatingStarsDemo extends Application {
 
                     RatingStarsDemo.this.getMainWindow().showNotification(
                             "You voted " + value + " stars for " + movieName
-                                    + ".");
+                                    + ".", Notification.TYPE_TRAY_NOTIFICATION);
 
-                    ((RatingStars) event.getProperty()).setValueCaption(
-                            (int) Math.round(value), "Your Rating");
+                    RatingStars changedRs = (RatingStars) event.getProperty();
+                    // reset value captions
+                    changedRs.setValueCaption(valueCaptions.values().toArray(
+                            new String[5]));
+                    // set "Your Rating" caption
+                    changedRs.setValueCaption((int) Math.round(value),
+                            "Your Rating");
 
                     // dummy logic to calculate "average" value
                     avgRs.setReadOnly(false);
