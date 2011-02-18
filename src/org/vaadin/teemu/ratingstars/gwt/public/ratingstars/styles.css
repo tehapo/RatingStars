@@ -44,7 +44,7 @@
 	position: absolute;
 	top: -100px;
 	left: -100px;
-	z-index: 2;
+	z-index: 10001;	/* v-window has z-index of 10000 */
 	color: #fff;
 	background: #464646;
 	font-family: Arial, Helvetica, Tahoma, Verdana, sans-serif;
