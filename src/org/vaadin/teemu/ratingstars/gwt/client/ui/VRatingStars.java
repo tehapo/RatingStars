@@ -1,5 +1,7 @@
 package org.vaadin.teemu.ratingstars.gwt.client.ui;
 
+import org.vaadin.teemu.ratingstars.RatingStars;
+
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
@@ -34,8 +36,10 @@ import com.vaadin.terminal.gwt.client.ValueMap;
  * transparent background image and the width of the .v-ratingstars-bar element
  * behind these star elements is changed according to the current value.
  * 
- * @author Teemu Pöntelin / IT Mill Ltd
+ * @author Teemu Pöntelin / Vaadin Ltd
  */
+// Deprecated stuff will be removed when doing proper conversion to Vaadin 7.
+@SuppressWarnings("deprecation")
 public class VRatingStars extends FocusWidget implements Paintable,
         HasAnimation {
 
@@ -68,13 +72,6 @@ public class VRatingStars extends FocusWidget implements Paintable,
 
     private int focusIndex = -1;
 
-    /** Values from the UIDL */
-    private static final String ATTR_MAX_VALUE = "maxValue";
-    private static final String ATTR_VALUE = "value";
-    private static final String ATTR_ANIMATED = "animated";
-    private static final String ATTR_IMMEDIATE = "immediate";
-    private static final String ATTR_READONLY = "readonly";
-    private static final String ATTR_DISABLED = "disabled";
     private int maxValue;
     private double value;
     private boolean animated;
@@ -106,12 +103,12 @@ public class VRatingStars extends FocusWidget implements Paintable,
         uidlId = uidl.getId();
 
         // Collect the relevant values from UIDL
-        maxValue = uidl.getIntAttribute(ATTR_MAX_VALUE);
-        immediate = uidl.getBooleanAttribute(ATTR_IMMEDIATE);
-        disabled = uidl.getBooleanAttribute(ATTR_DISABLED);
-        readonly = uidl.getBooleanAttribute(ATTR_READONLY);
-        setAnimationEnabled(uidl.getBooleanAttribute(ATTR_ANIMATED));
-        value = uidl.getDoubleVariable(ATTR_VALUE);
+        maxValue = uidl.getIntAttribute(RatingStars.ATTR_MAX_VALUE);
+        immediate = uidl.getBooleanAttribute(RatingStars.ATTR_IMMEDIATE);
+        disabled = uidl.getBooleanAttribute(RatingStars.ATTR_DISABLED);
+        readonly = uidl.getBooleanAttribute(RatingStars.ATTR_READONLY);
+        setAnimationEnabled(uidl.getBooleanAttribute(RatingStars.ATTR_ANIMATED));
+        value = uidl.getDoubleVariable(RatingStars.ATTR_VALUE);
 
         if (!disabled && !readonly) {
             sinkEvents(Event.ONCLICK);
@@ -137,7 +134,8 @@ public class VRatingStars extends FocusWidget implements Paintable,
         } else {
             setBarWidth(calcBarWidth(value));
         }
-        updateValueCaptions(uidl.getMapAttribute("valueCaptions"));
+        updateValueCaptions(uidl
+                .getMapAttribute(RatingStars.ATTR_VALUE_CAPTIONS));
     }
 
     private void updateValueCaptions(ValueMap valueCaptions) {
@@ -202,9 +200,9 @@ public class VRatingStars extends FocusWidget implements Paintable,
                 int rating = target.getPropertyInt("rating");
                 setFocusIndex(rating - 1);
                 setFocus(true);
-                VStarCaption.showAroundElement(target, target
-                        .getPropertyString("caption"), getCaptionId(target
-                        .getPropertyInt("rating")));
+                VStarCaption.showAroundElement(target,
+                        target.getPropertyString("caption"),
+                        getCaptionId(target.getPropertyInt("rating")));
             }
             break;
         case Event.ONMOUSEOUT:
@@ -248,9 +246,9 @@ public class VRatingStars extends FocusWidget implements Paintable,
 
             addClassName(focusedStar, STAR_CLASSNAME + "-focus");
             setBarWidth(calcBarWidth(focusedStar.getPropertyInt("rating")));
-            VStarCaption.showAroundElement(focusedStar, focusedStar
-                    .getPropertyString("caption"), getCaptionId(focusedStar
-                    .getPropertyInt("rating")));
+            VStarCaption.showAroundElement(focusedStar,
+                    focusedStar.getPropertyString("caption"),
+                    getCaptionId(focusedStar.getPropertyInt("rating")));
         }
     }
 

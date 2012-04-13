@@ -5,20 +5,26 @@ import java.util.Map;
 
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
+import com.vaadin.terminal.Vaadin6Component;
 import com.vaadin.ui.AbstractField;
-import com.vaadin.ui.ClientWidget;
 
 /**
  * RatingStars is a typical rating component seen in many web applications.
  * 
- * @author Teemu Pöntelin / IT Mill Ltd
+ * @author Teemu Pöntelin / Vaadin Ltd
  */
-@SuppressWarnings("unchecked")
-@ClientWidget(org.vaadin.teemu.ratingstars.gwt.client.ui.VRatingStars.class)
-public class RatingStars extends AbstractField implements
-        Comparable<RatingStars> {
+public class RatingStars extends AbstractField<Double> implements
+        Comparable<RatingStars>, Vaadin6Component {
 
-    private static final long serialVersionUID = -3594458506374404590L;
+    private static final long serialVersionUID = 5891927840599037355L;
+
+    public static final String ATTR_MAX_VALUE = "maxValue";
+    public static final String ATTR_VALUE = "value";
+    public static final String ATTR_VALUE_CAPTIONS = "valueCaptions";
+    public static final String ATTR_ANIMATED = "animated";
+    public static final String ATTR_IMMEDIATE = "immediate";
+    public static final String ATTR_READONLY = "readonly";
+    public static final String ATTR_DISABLED = "disabled";
 
     private int maxValue = 5;
 
@@ -66,19 +72,20 @@ public class RatingStars extends AbstractField implements
     }
 
     @Override
-    public Class getType() {
+    public Class<Double> getType() {
         return Double.class;
     }
 
     @Override
     public void paintContent(PaintTarget target) throws PaintException {
-        super.paintContent(target);
-        target.addAttribute("maxValue", maxValue);
-        target.addAttribute("animated", animated);
-        target.addAttribute("valueCaptions", valueCaptions);
-        target
-                .addVariable(this, "value", Double.valueOf(getValue()
-                        .toString()));
+        target.addAttribute(ATTR_IMMEDIATE, isImmediate());
+        target.addAttribute(ATTR_DISABLED, !isEnabled());
+        target.addAttribute(ATTR_READONLY, isReadOnly());
+        target.addAttribute(ATTR_MAX_VALUE, maxValue);
+        target.addAttribute(ATTR_ANIMATED, animated);
+        target.addAttribute(ATTR_VALUE_CAPTIONS, valueCaptions);
+        target.addVariable(this, ATTR_VALUE,
+                Double.valueOf(getValue().toString()));
     }
 
     @Override
@@ -86,10 +93,8 @@ public class RatingStars extends AbstractField implements
         super.setValue(Double.valueOf(value.toString()));
     }
 
-    @Override
+    @SuppressWarnings("rawtypes")
     public void changeVariables(Object source, Map variables) {
-        super.changeVariables(source, variables);
-
         if (variables.containsKey("value")) {
             setValue(Double.valueOf(variables.get("value").toString()));
         }

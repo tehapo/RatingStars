@@ -6,30 +6,30 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.terminal.WrappedRequest;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Label.ContentMode;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Root;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Window.Notification;
 
 /**
  * A demo application for the RatingStars component. For a live demo see
  * {@link http://teemu.virtuallypreinstalled.com/RatingStars}.
  * 
- * @author Teemu Pöntelin / IT Mill Ltd
+ * @author Teemu Pöntelin / Vaadin Ltd
  */
-public class RatingStarsDemo extends Application {
+public class RatingStarsDemo extends Root {
 
     private static final long serialVersionUID = 878415417860536617L;
 
@@ -38,8 +38,6 @@ public class RatingStarsDemo extends Application {
     private Set<RatingStars> allRatingStars = new HashSet<RatingStars>();
 
     private CheckBox animatedCheckBox;
-
-    private Window mainWindow;
 
     private Panel mainPanel;
 
@@ -58,14 +56,13 @@ public class RatingStarsDemo extends Application {
     }
 
     @Override
-    public void init() {
+    protected void init(WrappedRequest request) {
         initWindowAndDescription();
         initDemoPanel();
     }
 
     private void initWindowAndDescription() {
-        mainWindow = new Window("RatingStars Component Demo");
-        setMainWindow(mainWindow);
+        getRoot().setCaption("RatingStars Component Demo");
 
         VerticalLayout centerLayout = new VerticalLayout();
         centerLayout.setMargin(true);
@@ -74,14 +71,17 @@ public class RatingStarsDemo extends Application {
         mainPanel.setWidth("750px");
         centerLayout.addComponent(mainPanel);
         centerLayout.setComponentAlignment(mainPanel, Alignment.TOP_CENTER);
-        mainWindow.setContent(centerLayout);
+        setContent(centerLayout);
 
         StringBuilder descriptionXhtml = new StringBuilder();
-        descriptionXhtml.append("<h1>RatingStars Component Demo</h1>");
+        descriptionXhtml
+                .append("<h1 style=\"margin: 0;\">RatingStars Component Demo</h1>");
         descriptionXhtml
                 .append("<p>RatingStars is a simple component for giving rating values.</p>");
         descriptionXhtml
-                .append("<p>Download and rate this component at <a href=\"http://vaadin.com/directory#addon/20\">Vaadin Directory</a>.</p>");
+                .append("<p>Download and rate this component at <a href=\"http://vaadin.com/addon/ratingstars\">Vaadin Directory</a>. ");
+        descriptionXhtml
+                .append("Get the source code at <a href=\"https://github.com/tehapo/RatingStars\">GitHub</a>.</p>");
         descriptionXhtml.append("<p>Highlights:</p>");
         descriptionXhtml.append("<ul>");
         descriptionXhtml
@@ -90,9 +90,10 @@ public class RatingStarsDemo extends Application {
         descriptionXhtml.append("<li>Captions for individual values</li>");
         descriptionXhtml.append("<li>Optional transition animations</li>");
         descriptionXhtml.append("</ul>");
+        descriptionXhtml.append("<div style=\"height: 10px\"></div>");
 
         Label description = new Label(descriptionXhtml.toString(),
-                Label.CONTENT_XHTML);
+                ContentMode.XHTML);
         mainPanel.addComponent(description);
     }
 
@@ -108,13 +109,14 @@ public class RatingStarsDemo extends Application {
         animatedCheckBox = new CheckBox("Animated?");
         animatedCheckBox.setValue(true);
         animatedCheckBox.setImmediate(true);
-        animatedCheckBox.addListener(new Button.ClickListener() {
+        animatedCheckBox.addListener(new ValueChangeListener() {
 
-            private static final long serialVersionUID = -1291394320556343373L;
+            private static final long serialVersionUID = 6001160591512323325L;
 
-            public void buttonClick(ClickEvent event) {
+            @Override
+            public void valueChange(ValueChangeEvent event) {
                 for (RatingStars rs : allRatingStars) {
-                    rs.setAnimated((Boolean) event.getButton().getValue());
+                    rs.setAnimated((Boolean) event.getProperty().getValue());
                 }
             }
         });
@@ -131,9 +133,9 @@ public class RatingStarsDemo extends Application {
         demoLayout.addComponent(table);
 
         // theme demos
-        demoLayout.addComponent(new Label("<div style=\"margin-top: 20px\">"
-                + "The component has two built-in styles.</div>",
-                Label.CONTENT_XHTML));
+        demoLayout.addComponent(new Label(
+                "<strong>The component has two built-in styles.</strong>",
+                ContentMode.XHTML));
         RatingStars defaultRs = new RatingStars();
         defaultRs.setCaption("default");
         allRatingStars.add(defaultRs);
@@ -150,8 +152,8 @@ public class RatingStarsDemo extends Application {
         demoLayout.addComponent(themeLayout);
 
         // component states
-        demoLayout.addComponent(new Label("<div style=\"margin-top: 20px\">"
-                + "Component states</div>", Label.CONTENT_XHTML));
+        demoLayout.addComponent(new Label("<strong>Component states</strong>",
+                ContentMode.XHTML));
         RatingStars disabledRs = new RatingStars();
         disabledRs.setCaption("disabled");
         disabledRs.setValue(2.5);
@@ -191,12 +193,12 @@ public class RatingStarsDemo extends Application {
                     .toArray(new String[5]));
             yourRs.addListener(new Property.ValueChangeListener() {
 
-                private static final long serialVersionUID = -3277119031169194273L;
+                private static final long serialVersionUID = 3978380217446180197L;
 
                 public void valueChange(ValueChangeEvent event) {
                     Double value = (Double) event.getProperty().getValue();
 
-                    RatingStarsDemo.this.getMainWindow().showNotification(
+                    getRoot().showNotification(
                             "You voted " + value + " stars for " + movieName
                                     + ".", Notification.TYPE_TRAY_NOTIFICATION);
 
@@ -224,4 +226,5 @@ public class RatingStarsDemo extends Application {
             i.getItemProperty("Average rating").setValue(avgRs);
         }
     }
+
 }
