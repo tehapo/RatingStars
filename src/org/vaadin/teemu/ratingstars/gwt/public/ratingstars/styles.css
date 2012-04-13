@@ -66,15 +66,6 @@
 	top: -5px;
 	left: 0px;
 }
-.v-ie6 #v-ratingstars-star-caption div {
-	/* positioning fix for IE6 */
-	margin-left: 9px;
-}
-	
-.v-ie6 .v-ratingstars-star {
-	/* gif instead of png for IE6 */
-	background-image: url(images/star_19x18.gif);
-}
 
 /* tiny */
 .v-ratingstars-wrapper-tiny .v-ratingstars-bar {
@@ -84,8 +75,4 @@
 	background-image: url(images/star_12x11.png);
 	width: 12px;
 	height: 11px;
-}
-.v-ie6 .v-ratingstars-wrapper-tiny .v-ratingstars-star {
-	/* gif instead of png for IE6 */
-	background-image: url(images/star_12x11.gif);
 }

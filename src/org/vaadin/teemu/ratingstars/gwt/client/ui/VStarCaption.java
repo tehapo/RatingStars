@@ -3,7 +3,6 @@ package org.vaadin.teemu.ratingstars.gwt.client.ui;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
-import com.vaadin.terminal.gwt.client.BrowserInfo;
 
 public abstract class VStarCaption {
 
@@ -37,19 +36,11 @@ public abstract class VStarCaption {
             Element starCaption = getStarCaption();
 
             // set the text and display element (to get width for calculations)
-            starCaption.getElementsByTagName("span").getItem(0).setInnerText(
-                    caption);
+            starCaption.getElementsByTagName("span").getItem(0)
+                    .setInnerText(caption);
             starCaption.setPropertyString("captionId", captionId);
             Style starCaptionStyle = starCaption.getStyle();
             starCaptionStyle.setProperty("display", "block");
-
-            if (BrowserInfo.get().isIE6()) {
-                // IE6 workaround for styling inner element positioning, set the
-                // width explicitly.
-                starCaption.getStyle().setProperty("width", "auto");
-                starCaption.getStyle().setProperty("width",
-                        starCaption.getClientWidth() + "px");
-            }
 
             // calculate position
             int x = target.getAbsoluteLeft();
