@@ -10,17 +10,17 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.terminal.WrappedRequest;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Label.ContentMode;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Root;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 /**
@@ -29,17 +29,14 @@ import com.vaadin.ui.VerticalLayout;
  * 
  * @author Teemu Pöntelin / Vaadin Ltd
  */
-public class RatingStarsDemo extends Root {
+public class RatingStarsDemo extends UI {
 
-    private static final long serialVersionUID = 878415417860536617L;
+    private static final long serialVersionUID = 7705972095201251401L;
 
     private Table table;
-
     private Set<RatingStars> allRatingStars = new HashSet<RatingStars>();
-
     private CheckBox animatedCheckBox;
-
-    private Panel mainPanel;
+    private VerticalLayout mainLayout;
 
     private String[] movieNames = { "The Matrix", "Memento",
             "Kill Bill: Vol. 1" };
@@ -56,18 +53,20 @@ public class RatingStarsDemo extends Root {
     }
 
     @Override
-    protected void init(WrappedRequest request) {
+    protected void init(VaadinRequest request) {
         initWindowAndDescription();
         initDemoPanel();
     }
 
     private void initWindowAndDescription() {
-        getRoot().setCaption("RatingStars Component Demo");
+        getPage().setTitle("RatingStars Component Demo");
 
         VerticalLayout centerLayout = new VerticalLayout();
         centerLayout.setMargin(true);
 
-        mainPanel = new Panel();
+        mainLayout = new VerticalLayout();
+        mainLayout.setMargin(true);
+        Panel mainPanel = new Panel(mainLayout);
         mainPanel.setWidth("750px");
         centerLayout.addComponent(mainPanel);
         centerLayout.setComponentAlignment(mainPanel, Alignment.TOP_CENTER);
@@ -93,8 +92,8 @@ public class RatingStarsDemo extends Root {
         descriptionXhtml.append("<div style=\"height: 10px\"></div>");
 
         Label description = new Label(descriptionXhtml.toString(),
-                ContentMode.XHTML);
-        mainPanel.addComponent(description);
+                ContentMode.HTML);
+        mainLayout.addComponent(description);
     }
 
     private void initDemoPanel() {
@@ -103,13 +102,13 @@ public class RatingStarsDemo extends Root {
         demoLayout.setSpacing(true);
         demoLayout.setMargin(true);
         demoPanel.setContent(demoLayout);
-        mainPanel.addComponent(demoPanel);
+        mainLayout.addComponent(demoPanel);
 
         // animated checkbox
         animatedCheckBox = new CheckBox("Animated?");
         animatedCheckBox.setValue(true);
         animatedCheckBox.setImmediate(true);
-        animatedCheckBox.addListener(new ValueChangeListener() {
+        animatedCheckBox.addValueChangeListener(new ValueChangeListener() {
 
             private static final long serialVersionUID = 6001160591512323325L;
 
@@ -135,7 +134,7 @@ public class RatingStarsDemo extends Root {
         // theme demos
         demoLayout.addComponent(new Label(
                 "<strong>The component has two built-in styles.</strong>",
-                ContentMode.XHTML));
+                ContentMode.HTML));
         RatingStars defaultRs = new RatingStars();
         defaultRs.setCaption("default");
         allRatingStars.add(defaultRs);
@@ -153,7 +152,7 @@ public class RatingStarsDemo extends Root {
 
         // component states
         demoLayout.addComponent(new Label("<strong>Component states</strong>",
-                ContentMode.XHTML));
+                ContentMode.HTML));
         RatingStars disabledRs = new RatingStars();
         disabledRs.setCaption("disabled");
         disabledRs.setValue(2.5);
@@ -181,7 +180,7 @@ public class RatingStarsDemo extends Root {
 
             final RatingStars avgRs = new RatingStars();
             avgRs.setMaxValue(5);
-            avgRs.setValue(r.nextFloat() * 4 + 1);
+            avgRs.setValue(r.nextDouble() * 4 + 1);
             avgRs.setReadOnly(true);
             allRatingStars.add(avgRs);
 
@@ -191,16 +190,16 @@ public class RatingStarsDemo extends Root {
             yourRs.setDescription("Your rating");
             yourRs.setValueCaption(valueCaptions.values()
                     .toArray(new String[5]));
-            yourRs.addListener(new Property.ValueChangeListener() {
+            yourRs.addValueChangeListener(new Property.ValueChangeListener() {
 
                 private static final long serialVersionUID = 3978380217446180197L;
 
                 public void valueChange(ValueChangeEvent event) {
                     Double value = (Double) event.getProperty().getValue();
 
-                    getRoot().showNotification(
-                            "You voted " + value + " stars for " + movieName
-                                    + ".", Notification.TYPE_TRAY_NOTIFICATION);
+                    Notification.show("You voted " + value + " stars for "
+                            + movieName + ".",
+                            Notification.Type.TRAY_NOTIFICATION);
 
                     RatingStars changedRs = (RatingStars) event.getProperty();
                     // reset value captions

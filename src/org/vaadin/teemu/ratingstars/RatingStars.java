@@ -3,10 +3,10 @@ package org.vaadin.teemu.ratingstars;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.vaadin.terminal.PaintException;
-import com.vaadin.terminal.PaintTarget;
-import com.vaadin.terminal.Vaadin6Component;
+import com.vaadin.server.PaintException;
+import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.LegacyComponent;
 
 /**
  * RatingStars is a typical rating component seen in many web applications.
@@ -14,9 +14,9 @@ import com.vaadin.ui.AbstractField;
  * @author Teemu Pöntelin / Vaadin Ltd
  */
 public class RatingStars extends AbstractField<Double> implements
-        Comparable<RatingStars>, Vaadin6Component {
+        Comparable<RatingStars>, LegacyComponent {
 
-    private static final long serialVersionUID = 5891927840599037355L;
+    private static final long serialVersionUID = -306441351082638221L;
 
     public static final String ATTR_MAX_VALUE = "maxValue";
     public static final String ATTR_VALUE = "value";
@@ -89,8 +89,8 @@ public class RatingStars extends AbstractField<Double> implements
     }
 
     @Override
-    public void setValue(Object value) {
-        super.setValue(Double.valueOf(value.toString()));
+    public void setValue(Double value) {
+        super.setValue(value);
     }
 
     @SuppressWarnings("rawtypes")
