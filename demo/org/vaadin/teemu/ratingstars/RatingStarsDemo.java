@@ -136,10 +136,12 @@ public class RatingStarsDemo extends UI {
                 "<strong>The component has two built-in styles.</strong>",
                 ContentMode.HTML));
         RatingStars defaultRs = new RatingStars();
+        defaultRs.setDescription("Default RatingStars");
         defaultRs.setCaption("default");
         allRatingStars.add(defaultRs);
 
         RatingStars tinyRs = new RatingStars();
+        tinyRs.setMaxValue(3);
         tinyRs.setStyleName("tiny");
         tinyRs.setCaption("tiny");
         allRatingStars.add(tinyRs);
@@ -187,7 +189,6 @@ public class RatingStarsDemo extends UI {
             final RatingStars yourRs = new RatingStars();
             yourRs.setMaxValue(5);
             yourRs.setImmediate(true);
-            yourRs.setDescription("Your rating");
             yourRs.setValueCaption(valueCaptions.values()
                     .toArray(new String[5]));
             yourRs.addValueChangeListener(new Property.ValueChangeListener() {
