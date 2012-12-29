@@ -1,4 +1,4 @@
-package org.vaadin.teemu.ratingstars.gwt.client.ui;
+package org.vaadin.teemu.ratingstars.gwt.client;
 
 import org.vaadin.teemu.ratingstars.RatingStars;
 
@@ -40,7 +40,7 @@ import com.vaadin.client.ValueMap;
  */
 // Deprecated stuff will be removed when doing proper conversion to Vaadin 7.
 @SuppressWarnings("deprecation")
-public class VRatingStars extends FocusWidget implements Paintable,
+public class RatingStarsWidget extends FocusWidget implements Paintable,
         HasAnimation {
 
     /** Set the tagname used to statically resolve widget from UIDL. */
@@ -79,7 +79,7 @@ public class VRatingStars extends FocusWidget implements Paintable,
     private boolean readonly;
     private boolean disabled;
 
-    public VRatingStars() {
+    public RatingStarsWidget() {
         setElement(Document.get().createDivElement());
         setStyleName(WRAPPER_CLASSNAME);
 
@@ -146,9 +146,9 @@ public class VRatingStars extends FocusWidget implements Paintable,
                 starElement.setPropertyString("caption", caption);
 
                 String captionId = getCaptionId(rating);
-                if (VStarCaption.isVisibleForCaptionId(captionId)) {
+                if (StarCaptionUtil.isVisibleForCaptionId(captionId)) {
                     // update currently visible caption
-                    VStarCaption.showAroundElement(starElement, caption,
+                    StarCaptionUtil.showAroundElement(starElement, caption,
                             captionId);
                 }
             }
@@ -200,7 +200,7 @@ public class VRatingStars extends FocusWidget implements Paintable,
                 int rating = target.getPropertyInt("rating");
                 setFocusIndex(rating - 1);
                 setFocus(true);
-                VStarCaption.showAroundElement(target,
+                StarCaptionUtil.showAroundElement(target,
                         target.getPropertyString("caption"),
                         getCaptionId(target.getPropertyInt("rating")));
             }
@@ -208,7 +208,7 @@ public class VRatingStars extends FocusWidget implements Paintable,
         case Event.ONMOUSEOUT:
             setBarWidth(calcBarWidth(value));
             setFocusIndex(-1);
-            VStarCaption.hide();
+            StarCaptionUtil.hide();
             break;
         case Event.ONFOCUS:
             addClassName(getElement(), WRAPPER_CLASSNAME + "-focus");
@@ -226,7 +226,7 @@ public class VRatingStars extends FocusWidget implements Paintable,
             removeClassName(getElement(), WRAPPER_CLASSNAME + "-focus");
             setFocusIndex(-1);
             setBarWidth(calcBarWidth(value));
-            VStarCaption.hide();
+            StarCaptionUtil.hide();
             break;
         case Event.ONKEYUP:
             handleKeyUp(event);
@@ -246,7 +246,7 @@ public class VRatingStars extends FocusWidget implements Paintable,
 
             addClassName(focusedStar, STAR_CLASSNAME + "-focus");
             setBarWidth(calcBarWidth(focusedStar.getPropertyInt("rating")));
-            VStarCaption.showAroundElement(focusedStar,
+            StarCaptionUtil.showAroundElement(focusedStar,
                     focusedStar.getPropertyString("caption"),
                     getCaptionId(focusedStar.getPropertyInt("rating")));
         }

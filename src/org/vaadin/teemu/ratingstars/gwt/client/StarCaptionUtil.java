@@ -1,12 +1,12 @@
-package org.vaadin.teemu.ratingstars.gwt.client.ui;
+package org.vaadin.teemu.ratingstars.gwt.client;
 
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
 
-public abstract class VStarCaption {
+abstract class StarCaptionUtil {
 
-    public static final String STAR_CAPTION_ID = VRatingStars.STAR_CLASSNAME
+    public static final String STAR_CAPTION_ID = RatingStarsWidget.STAR_CLASSNAME
             + "-caption";
 
     private static Element getStarCaption() {

@@ -1,4 +1,4 @@
-package org.vaadin.teemu.ratingstars.gwt.client.ui;
+package org.vaadin.teemu.ratingstars.gwt.client;
 
 import org.vaadin.teemu.ratingstars.RatingStars;
 
@@ -18,7 +18,7 @@ public class RatingStarsConnector extends AbstractFieldConnector implements
 
     @Override
     protected Widget createWidget() {
-        return GWT.create(VRatingStars.class);
+        return GWT.create(RatingStarsWidget.class);
     }
 
     public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
