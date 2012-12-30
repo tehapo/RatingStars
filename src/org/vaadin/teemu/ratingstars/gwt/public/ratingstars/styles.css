@@ -6,6 +6,7 @@
 	outline: none;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
+	border-radius: 3px;
 }
 .v-ratingstars-wrapper-focus {
 	border-color: #3b5a75 #4b7192 #507596;
@@ -28,6 +29,7 @@
 	z-index: 0;
 	border-right: 1px solid #9f9f9f;
 	left: -1px;
+	height: 100%;
 }
 .v-ratingstars-star {
 	background-image: url(images/star_19x18.png);
@@ -56,7 +58,8 @@
 	text-shadow: #000 0 1px 0;
 	opacity: 0.9;
 	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px; 	
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
 }
 #v-ratingstars-star-caption div {
 	height: 5px;

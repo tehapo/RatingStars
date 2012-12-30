@@ -1,12 +1,9 @@
 package org.vaadin.teemu.ratingstars;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.vaadin.teemu.ratingstars.gwt.client.RatingStarsServerRpc;
+import org.vaadin.teemu.ratingstars.gwt.client.RatingStarsState;
 
-import com.vaadin.server.PaintException;
-import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractField;
-import com.vaadin.ui.LegacyComponent;
 
 /**
  * RatingStars is a typical rating component seen in many web applications.
@@ -14,23 +11,19 @@ import com.vaadin.ui.LegacyComponent;
  * @author Teemu Pöntelin / Vaadin Ltd
  */
 public class RatingStars extends AbstractField<Double> implements
-        Comparable<RatingStars>, LegacyComponent {
+        Comparable<RatingStars> {
 
-    private static final long serialVersionUID = -306441351082638221L;
+    private static final long serialVersionUID = 4689425856123104186L;
 
-    public static final String ATTR_MAX_VALUE = "maxValue";
-    public static final String ATTR_VALUE = "value";
-    public static final String ATTR_VALUE_CAPTIONS = "valueCaptions";
-    public static final String ATTR_ANIMATED = "animated";
-    public static final String ATTR_IMMEDIATE = "immediate";
-    public static final String ATTR_READONLY = "readonly";
-    public static final String ATTR_DISABLED = "disabled";
+    private final RatingStarsServerRpc rpc = new RatingStarsServerRpc() {
 
-    private int maxValue = 5;
+        private static final long serialVersionUID = -7317353863605973697L;
 
-    private boolean animated = true;
-
-    private Map<Integer, String> valueCaptions = new HashMap<Integer, String>();
+        @Override
+        public void valueChanged(double newValue) {
+            setValue(newValue);
+        }
+    };
 
     /**
      * Constructs a new animated RatingStars component with default value of 0.0
@@ -40,7 +33,17 @@ public class RatingStars extends AbstractField<Double> implements
      * @see #setAnimated(boolean)
      */
     public RatingStars() {
-        setValue(0.0); // default to zero
+        registerRpc(rpc);
+
+        // Set the defaults.
+        setValue(0.0);
+        setMaxValue(5);
+        setAnimated(true);
+    }
+
+    @Override
+    protected RatingStarsState getState() {
+        return (RatingStarsState) super.getState();
     }
 
     /**
@@ -54,7 +57,7 @@ public class RatingStars extends AbstractField<Double> implements
             throw new IllegalArgumentException("Given maximum value ("
                     + maxValue + ") must be greater than zero.");
         }
-        this.maxValue = maxValue;
+        getState().maxValue = maxValue;
     }
 
     /**
@@ -65,10 +68,7 @@ public class RatingStars extends AbstractField<Double> implements
      *            should the client-side transitions be animated
      */
     public void setAnimated(boolean animated) {
-        if (this.animated != animated) {
-            this.animated = animated;
-            requestRepaint();
-        }
+        getState().animated = animated;
     }
 
     @Override
@@ -77,29 +77,12 @@ public class RatingStars extends AbstractField<Double> implements
     }
 
     @Override
-    public void paintContent(PaintTarget target) throws PaintException {
-        target.addAttribute(ATTR_IMMEDIATE, isImmediate());
-        target.addAttribute(ATTR_DISABLED, !isEnabled());
-        target.addAttribute(ATTR_READONLY, isReadOnly());
-        target.addAttribute(ATTR_MAX_VALUE, maxValue);
-        target.addAttribute(ATTR_ANIMATED, animated);
-        target.addAttribute(ATTR_VALUE_CAPTIONS, valueCaptions);
-        target.addVariable(this, ATTR_VALUE,
-                Double.valueOf(getValue().toString()));
+    public void setValue(Double value) {
+        super.setValue(value);
+        getState().value = value;
     }
 
     @Override
-    public void setValue(Double value) {
-        super.setValue(value);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public void changeVariables(Object source, Map variables) {
-        if (variables.containsKey("value")) {
-            setValue(Double.valueOf(variables.get("value").toString()));
-        }
-    }
-
     public int compareTo(RatingStars o) {
         return ((Double) this.getValue()).compareTo((Double) o.getValue());
     }
@@ -112,7 +95,7 @@ public class RatingStars extends AbstractField<Double> implements
      * @see #setValueCaption(String...)
      */
     public void setValueCaption(int value, String captionForValue) {
-        valueCaptions.put(value, captionForValue);
+        getState().valueCaptions.put(value, captionForValue);
     }
 
     /**
@@ -125,7 +108,7 @@ public class RatingStars extends AbstractField<Double> implements
     public void setValueCaption(String... captionsForValues) {
         int value = 1;
         for (String caption : captionsForValues) {
-            valueCaptions.put(value++, caption);
+            getState().valueCaptions.put(value++, caption);
         }
     }
 

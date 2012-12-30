@@ -1,25 +1,27 @@
 package org.vaadin.teemu.ratingstars.gwt.client;
 
-import org.vaadin.teemu.ratingstars.RatingStars;
+import java.util.Map;
 
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HasAnimation;
-import com.vaadin.client.ApplicationConnection;
-import com.vaadin.client.Paintable;
-import com.vaadin.client.UIDL;
-import com.vaadin.client.ValueMap;
+import com.google.gwt.user.client.ui.HasValue;
 
 /**
- * VRatingStars is the client-side implementation of the RatingStars component.
+ * RatingStarsWidget is the client-side implementation of the RatingStars
+ * component.
  * 
- * The DOM structure is as follows:
+ * The DOM tree for this component is constructed as follows:
  * 
  * <pre>
  *    div.v-ratingstars-wrapper
@@ -32,131 +34,77 @@ import com.vaadin.client.ValueMap;
  *            div.v-ratingstars-bar
  * </pre>
  * 
- * The main idea is that .v-ratingstars-star elements have a partially
- * transparent background image and the width of the .v-ratingstars-bar element
- * behind these star elements is changed according to the current value.
+ * The idea behind the DOM tree is that {@code .v-ratingstars-star} elements
+ * always have a partially transparent background image and the width of the
+ * {@code .v-ratingstars-bar} element behind these star elements is changed
+ * according to the current value.
  * 
  * @author Teemu Pöntelin / Vaadin Ltd
  */
-// Deprecated stuff will be removed when doing proper conversion to Vaadin 7.
-@SuppressWarnings("deprecation")
-public class RatingStarsWidget extends FocusWidget implements Paintable,
-        HasAnimation {
-
-    /** Set the tagname used to statically resolve widget from UIDL. */
-    public static final String TAGNAME = "ratingstars";
+public class RatingStarsWidget extends FocusWidget implements HasAnimation,
+        HasValue<Double>, HasValueChangeHandlers<Double> {
 
     /** Set the CSS class names to allow styling. */
-    public static final String CLASSNAME = "v-" + TAGNAME;
+    public static final String CLASSNAME = "v-ratingstars";
     public static final String STAR_CLASSNAME = CLASSNAME + "-star";
     public static final String BAR_CLASSNAME = CLASSNAME + "-bar";
     public static final String WRAPPER_CLASSNAME = CLASSNAME + "-wrapper";
 
     private static final int ANIMATION_DURATION_IN_MS = 150;
 
-    /** Component identifier in UIDL communications. */
-    String uidlId;
-
-    /** Reference to the server connection object. */
-    ApplicationConnection client;
-
+    // DOM elements
     private Element barDiv;
-
     private Element element;
-
-    private int width;
-
-    private int height;
-
     private Element[] starElements;
 
+    /** Currently focused star (by keyboard focus). */
     private int focusIndex = -1;
 
-    private int maxValue;
+    private int maxValue = 5;
     private double value;
+
     private boolean animated;
-    private boolean immediate;
     private boolean readonly;
-    private boolean disabled;
 
     public RatingStarsWidget() {
         setElement(Document.get().createDivElement());
         setStyleName(WRAPPER_CLASSNAME);
+        initDom();
+    }
+
+    private void initDom() {
+        if (element != null) {
+            // Remove previous element.
+            getElement().removeChild(element);
+        }
 
         element = Document.get().createDivElement();
         element.setClassName(CLASSNAME);
         getElement().appendChild(element);
+
+        createStarElements();
+
+        barDiv = createBarDiv();
+        element.appendChild(barDiv);
+
+        DOM.sinkEvents(getElement(), Event.ONCLICK | Event.ONMOUSEOVER
+                | Event.ONMOUSEOUT | Event.ONFOCUS | Event.ONBLUR
+                | Event.ONKEYUP);
     }
 
-    public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
-        // This call should be made first. Ensure correct implementation,
-        // and let the containing layout manage caption, etc.
-        if (client.updateComponent(this, uidl, true)) {
-            return;
-        }
-
-        // Save reference to server connection object to be able to send
-        // user interaction later
-        this.client = client;
-
-        // Save the UIDL identifier for the component
-        uidlId = uidl.getId();
-
-        // Collect the relevant values from UIDL
-        maxValue = uidl.getIntAttribute(RatingStars.ATTR_MAX_VALUE);
-        immediate = uidl.getBooleanAttribute(RatingStars.ATTR_IMMEDIATE);
-        disabled = uidl.getBooleanAttribute(RatingStars.ATTR_DISABLED);
-        readonly = uidl.getBooleanAttribute(RatingStars.ATTR_READONLY);
-        setAnimationEnabled(uidl.getBooleanAttribute(RatingStars.ATTR_ANIMATED));
-        value = uidl.getDoubleVariable(RatingStars.ATTR_VALUE);
-
-        if (!disabled && !readonly) {
-            sinkEvents(Event.ONCLICK);
-            sinkEvents(Event.ONMOUSEOVER);
-            sinkEvents(Event.ONMOUSEOUT);
-            sinkEvents(Event.ONFOCUS);
-            sinkEvents(Event.ONBLUR);
-            sinkEvents(Event.ONKEYUP);
-        } else {
-            DOM.sinkEvents(getElement(), 0);
-            setTabIndex(-1);
-        }
-
-        if (barDiv == null) {
-            // DOM structure not yet constructed
-            createStarElements();
-            initWidthAndHeight();
-            element.getStyle().setPropertyPx("width", width);
-            element.getStyle().setPropertyPx("height", height);
-
-            barDiv = createBarDiv(height);
-            element.appendChild(barDiv);
-        } else {
-            setBarWidth(calcBarWidth(value));
-        }
-        updateValueCaptions(uidl
-                .getMapAttribute(RatingStars.ATTR_VALUE_CAPTIONS));
-    }
-
-    private void updateValueCaptions(ValueMap valueCaptions) {
+    void updateValueCaptions(Map<Integer, String> valueCaptions) {
         for (Element starElement : starElements) {
             int rating = starElement.getPropertyInt("rating");
-            String caption = valueCaptions.getString(Integer.toString(rating));
+            String caption = valueCaptions.get(rating);
             if (caption != null) {
                 starElement.setPropertyString("caption", caption);
 
-                String captionId = getCaptionId(rating);
-                if (StarCaptionUtil.isVisibleForCaptionId(captionId)) {
+                if (StarCaptionUtil.isVisibleForStarElement(starElement)) {
                     // update currently visible caption
-                    StarCaptionUtil.showAroundElement(starElement, caption,
-                            captionId);
+                    StarCaptionUtil.showAroundElement(starElement, caption);
                 }
             }
         }
-    }
-
-    private String getCaptionId(int rating) {
-        return uidlId + "-" + rating;
     }
 
     private void createStarElements() {
@@ -168,22 +116,10 @@ public class RatingStarsWidget extends FocusWidget implements Paintable,
         }
     }
 
-    /**
-     * Star elements must be created before calling this method.
-     */
-    private void initWidthAndHeight() {
-        for (Element starDiv : starElements) {
-            width += starDiv.getClientWidth();
-            if (height < starDiv.getClientHeight()) {
-                height = starDiv.getClientHeight();
-            }
-        }
-    }
-
     @Override
     public void onBrowserEvent(Event event) {
-        if (uidlId == null || client == null) {
-            return;
+        if (!isEnabled() || readonly) {
+            return; // Do nothing if disabled or read-only.
         }
 
         super.onBrowserEvent(event);
@@ -192,7 +128,7 @@ public class RatingStarsWidget extends FocusWidget implements Paintable,
         switch (DOM.eventGetType(event)) {
         case Event.ONCLICK:
             // update value
-            setValue(target);
+            setValueFromElement(target);
             break;
         case Event.ONMOUSEOVER:
             // animate
@@ -201,8 +137,7 @@ public class RatingStarsWidget extends FocusWidget implements Paintable,
                 setFocusIndex(rating - 1);
                 setFocus(true);
                 StarCaptionUtil.showAroundElement(target,
-                        target.getPropertyString("caption"),
-                        getCaptionId(target.getPropertyInt("rating")));
+                        target.getPropertyString("caption"));
             }
             break;
         case Event.ONMOUSEOUT:
@@ -247,8 +182,7 @@ public class RatingStarsWidget extends FocusWidget implements Paintable,
             addClassName(focusedStar, STAR_CLASSNAME + "-focus");
             setBarWidth(calcBarWidth(focusedStar.getPropertyInt("rating")));
             StarCaptionUtil.showAroundElement(focusedStar,
-                    focusedStar.getPropertyString("caption"),
-                    getCaptionId(focusedStar.getPropertyInt("rating")));
+                    focusedStar.getPropertyString("caption"));
         }
     }
 
@@ -261,11 +195,10 @@ public class RatingStarsWidget extends FocusWidget implements Paintable,
         }
     }
 
-    private void setValue(Element target) {
+    private void setValueFromElement(Element target) {
         if (target.getClassName().contains(STAR_CLASSNAME)) {
             int ratingValue = target.getPropertyInt("rating");
-            value = ratingValue;
-            client.updateVariable(uidlId, "value", ratingValue, immediate);
+            setValue((double) ratingValue, true);
         }
     }
 
@@ -297,7 +230,7 @@ public class RatingStarsWidget extends FocusWidget implements Paintable,
         } else if (event.getKeyCode() == KeyCodes.KEY_LEFT) {
             changeFocusIndex(-1);
         } else if (event.getKeyCode() == KeyCodes.KEY_ENTER) {
-            setValue(starElements[focusIndex]);
+            setValueFromElement(starElements[focusIndex]);
         }
     }
 
@@ -307,11 +240,10 @@ public class RatingStarsWidget extends FocusWidget implements Paintable,
      * @return the newly created DivElement representing the bar.
      * @see #setBarWidth(byte)
      */
-    private Element createBarDiv(int height) {
+    private Element createBarDiv() {
         DivElement barDiv = Document.get().createDivElement();
         barDiv.setClassName(BAR_CLASSNAME);
         barDiv.getStyle().setProperty("width", calcBarWidth(value) + "%");
-        barDiv.getStyle().setPropertyPx("height", height);
         return barDiv;
     }
 
@@ -376,12 +308,60 @@ public class RatingStarsWidget extends FocusWidget implements Paintable,
         return starDiv;
     }
 
+    @Override
     public boolean isAnimationEnabled() {
         return animated;
     }
 
+    @Override
     public void setAnimationEnabled(boolean enable) {
         this.animated = enable;
     }
 
+    public void setMaxValue(int maxValue) {
+        if (this.maxValue != maxValue) {
+            this.maxValue = maxValue;
+            initDom(); // Recreate the DOM.
+        }
+    }
+
+    private void internalSetValue(double value) {
+        if (this.value != value) {
+            this.value = value;
+            setBarWidth(calcBarWidth(this.value));
+        }
+    }
+
+    public void setReadOnly(boolean readonly) {
+        if (this.readonly != readonly) {
+            this.readonly = readonly;
+        }
+    }
+
+    @Override
+    public HandlerRegistration addValueChangeHandler(
+            ValueChangeHandler<Double> handler) {
+        return addHandler(handler, ValueChangeEvent.getType());
+    }
+
+    @Override
+    public Double getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(Double value) {
+        setValue(value, false);
+    }
+
+    @Override
+    public void setValue(Double value, boolean fireEvents) {
+        // Null not supported -> convert to zero.
+        if (value == null) {
+            value = 0.0;
+        }
+
+        ValueChangeEvent.fireIfNotEqual(this, this.value, value);
+        internalSetValue(value);
+    }
 }

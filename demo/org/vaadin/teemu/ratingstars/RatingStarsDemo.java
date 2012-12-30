@@ -175,6 +175,7 @@ public class RatingStarsDemo extends UI {
     /**
      * Populate the table with some random data.
      */
+    @SuppressWarnings("unchecked")
     private void populateTable() {
         Random r = new Random();
         for (final String movieName : movieNames) {

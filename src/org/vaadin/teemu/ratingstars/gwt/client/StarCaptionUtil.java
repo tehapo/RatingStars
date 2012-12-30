@@ -30,15 +30,14 @@ abstract class StarCaptionUtil {
         return starCaption;
     }
 
-    public static void showAroundElement(Element target, String caption,
-            String captionId) {
+    public static void showAroundElement(Element target, String caption) {
         if (caption != null) {
             Element starCaption = getStarCaption();
 
             // set the text and display element (to get width for calculations)
             starCaption.getElementsByTagName("span").getItem(0)
                     .setInnerText(caption);
-            starCaption.setPropertyString("captionId", captionId);
+            starCaption.setPropertyObject("starElement", target);
             Style starCaptionStyle = starCaption.getStyle();
             starCaptionStyle.setProperty("display", "block");
 
@@ -57,10 +56,10 @@ abstract class StarCaptionUtil {
         }
     }
 
-    public static boolean isVisibleForCaptionId(String captionId) {
+    public static boolean isVisibleForStarElement(Element element) {
         return isVisible()
-                && getStarCaption().getPropertyString("captionId").equals(
-                        captionId);
+                && getStarCaption().getPropertyObject("starElement").equals(
+                        element);
     }
 
     public static boolean isVisible() {
