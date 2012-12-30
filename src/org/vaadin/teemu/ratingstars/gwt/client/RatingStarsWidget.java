@@ -146,7 +146,7 @@ public class RatingStarsWidget extends FocusWidget implements HasAnimation,
             StarCaptionUtil.hide();
             break;
         case Event.ONFOCUS:
-            addClassName(getElement(), WRAPPER_CLASSNAME + "-focus");
+            getElement().addClassName(WRAPPER_CLASSNAME + "-focus");
             if (focusIndex < 0) {
                 if (Math.round(value) > 0) {
                     // focus the current value (or the closest int)
@@ -158,7 +158,7 @@ public class RatingStarsWidget extends FocusWidget implements HasAnimation,
             }
             break;
         case Event.ONBLUR:
-            removeClassName(getElement(), WRAPPER_CLASSNAME + "-focus");
+            getElement().removeClassName(WRAPPER_CLASSNAME + "-focus");
             setFocusIndex(-1);
             setBarWidth(calcBarWidth(value));
             StarCaptionUtil.hide();
@@ -172,14 +172,14 @@ public class RatingStarsWidget extends FocusWidget implements HasAnimation,
     private void setFocusIndex(int index) {
         // remove old focus class
         if (focusIndex >= 0 && focusIndex < starElements.length) {
-            removeClassName(starElements[focusIndex], STAR_CLASSNAME + "-focus");
+            starElements[focusIndex].removeClassName(STAR_CLASSNAME + "-focus");
         }
         // update focusIndex and add class
         focusIndex = index;
         if (focusIndex >= 0 && focusIndex < starElements.length) {
             Element focusedStar = starElements[focusIndex];
 
-            addClassName(focusedStar, STAR_CLASSNAME + "-focus");
+            focusedStar.addClassName(STAR_CLASSNAME + "-focus");
             setBarWidth(calcBarWidth(focusedStar.getPropertyInt("rating")));
             StarCaptionUtil.showAroundElement(focusedStar,
                     focusedStar.getPropertyString("caption"));
@@ -199,28 +199,6 @@ public class RatingStarsWidget extends FocusWidget implements HasAnimation,
         if (target.getClassName().contains(STAR_CLASSNAME)) {
             int ratingValue = target.getPropertyInt("rating");
             setValue((double) ratingValue, true);
-        }
-    }
-
-    private void addClassName(Element element, String className) {
-        String currentClassName = element.getClassName();
-        if (!currentClassName.contains(className)) {
-            String newClassName = currentClassName + " " + className;
-            element.setClassName(newClassName.trim());
-        }
-    }
-
-    private void removeClassName(Element element, String classNameToRemove) {
-        String currentClassName = element.getClassName();
-        if (currentClassName.contains(classNameToRemove)) {
-            String[] classNames = currentClassName.split(" ");
-            String newClassName = "";
-            for (String className : classNames) {
-                if (!className.equals(classNameToRemove)) {
-                    newClassName += className + " ";
-                }
-            }
-            element.setClassName(newClassName);
         }
     }
 
