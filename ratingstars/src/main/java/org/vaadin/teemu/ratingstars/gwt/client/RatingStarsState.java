@@ -7,10 +7,9 @@ import com.vaadin.shared.AbstractFieldState;
 import com.vaadin.shared.annotations.DelegateToWidget;
 
 public class RatingStarsState extends AbstractFieldState {
-
     private static final long serialVersionUID = 3623150608620619618L;
 
-    public Map<Integer, String> valueCaptions = new HashMap<Integer, String>();
+    public Map<Integer, String> valueCaptions = new HashMap<>();
 
     @DelegateToWidget("setAnimationEnabled")
     public boolean animated;

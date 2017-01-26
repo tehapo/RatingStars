@@ -50,8 +50,7 @@ public class RatingStars extends AbstractField<Double> implements Comparable<Rat
      */
     public void setMaxValue(int maxValue) {
         if (maxValue <= 0) {
-            throw new IllegalArgumentException("Given maximum value ("
-                    + maxValue + ") must be greater than zero.");
+            throw new IllegalArgumentException("Given maximum value (" + maxValue + ") must be greater than zero.");
         }
         getState().maxValue = maxValue;
     }
