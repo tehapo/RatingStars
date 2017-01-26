@@ -1,7 +1,5 @@
 package org.vaadin.teemu.ratingstars.gwt.client;
 
-import org.vaadin.teemu.ratingstars.RatingStars;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -10,6 +8,7 @@ import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.communication.StateChangeEvent;
 import com.vaadin.client.ui.AbstractFieldConnector;
 import com.vaadin.shared.ui.Connect;
+import org.vaadin.teemu.ratingstars.RatingStars;
 
 @Connect(RatingStars.class)
 public class RatingStarsConnector extends AbstractFieldConnector implements
