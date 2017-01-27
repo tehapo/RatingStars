@@ -31,6 +31,16 @@
 	left: -1px;
 	height: 100%;
 }
+
+.v-caption.v-disabled,
+.v-ratingstars-wrapper.v-disabled {
+	opacity: 0.5;
+}
+
+.v-disabled .v-ratingstars-star {
+	cursor: default;
+}
+
 .v-ratingstars-star {
 	background-image: url(images/star_19x18.png);
 	background-position: top left;
