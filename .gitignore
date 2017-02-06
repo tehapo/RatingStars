@@ -1,5 +1,10 @@
+*.iml
+.DS_Store
+
 .classpath
 .project
 .settings/
 build/
 widgetsets
+gwt-unitCache
+.idea

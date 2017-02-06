@@ -1,7 +1,0 @@
-<module>
-	<inherits name="com.vaadin.terminal.gwt.DefaultWidgetSet" /> 
-	<stylesheet src="ratingstars/styles.css"/>
-	
-	<!-- uncomment this to compile only for Firefox -->
-	<!-- <set-property name="user.agent" value="gecko"/> -->
-</module>
