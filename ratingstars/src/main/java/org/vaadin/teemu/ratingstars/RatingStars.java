@@ -7,7 +7,7 @@ import org.vaadin.teemu.ratingstars.gwt.client.RatingStarsState;
 /**
  * RatingStars is a typical rating component seen in many web applications.
  *
- * @author Teemu Pöntelin / Vaadin Ltd
+ * @author Teemu Pöntelin
  */
 public class RatingStars extends AbstractField<Double> implements Comparable<RatingStars> {
     private static final long serialVersionUID = 4689425856123104186L;

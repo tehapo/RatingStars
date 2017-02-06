@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.HasValue;
  * {@code .v-ratingstars-bar} element behind these star elements is changed
  * according to the current value.
  * 
- * @author Teemu Pöntelin / Vaadin Ltd
+ * @author Teemu Pöntelin
  */
 public class RatingStarsWidget extends FocusWidget implements HasAnimation,
         HasValue<Double>, HasValueChangeHandlers<Double> {
