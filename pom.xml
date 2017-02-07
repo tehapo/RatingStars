@@ -5,7 +5,7 @@
     <artifactId>ratingstars-root</artifactId>
     <version>3.0-beta1</version>
     <packaging>pom</packaging>
-    <name>RatingStars Add-on Root Project</name>
+    <name>RatingStars Root Project</name>
 
     <modules>
         <module>ratingstars</module>
