@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
         <groupId>org.vaadin.addons</groupId>
         <artifactId>ratingstars-root</artifactId>
-        <version>3.0-SNAPSHOT</version>
+        <version>3.0-beta1</version>
     </parent>
 
     <organization>
