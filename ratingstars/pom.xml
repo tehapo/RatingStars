@@ -5,7 +5,7 @@
     <artifactId>ratingstars</artifactId>
     <packaging>jar</packaging>
     <name>RatingStars</name>
-    <version>3.0-beta2</version>
+    <version>3.0-beta3</version>
 
     <organization>
         <name>Teemu Pöntelin</name>
@@ -20,7 +20,7 @@
         <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
         <Vaadin-License-Title>Apache License 2.0</Vaadin-License-Title>
         <Vaadin-Addon>${project.artifactId}-${project.version}.jar</Vaadin-Addon>
-        <widgetset.name>org.vaadin.teemu.ratingstars.gwt.RatingStarsWidgets</widgetset.name>
+        <widgetset.name>org.vaadin.teemu.ratingstars.gwt.RatingStarsWidgetset</widgetset.name>
 
         <vaadin.version>8.0.0.beta2</vaadin.version>
 
