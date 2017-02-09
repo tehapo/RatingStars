@@ -8,3 +8,4 @@ build/
 widgetsets
 gwt-unitCache
 .idea
+target/
