@@ -5,7 +5,7 @@
     <artifactId>ratingstars-demo</artifactId>
     <packaging>war</packaging>
     <name>RatingStars Demo</name>
-    <version>3.0-beta3</version>
+    <version>3.0.0</version>
 
     <licenses>
         <license>
@@ -18,7 +18,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <vaadin.version>8.0.0.beta2</vaadin.version>
+        <vaadin.version>8.0.0</vaadin.version>
         <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>

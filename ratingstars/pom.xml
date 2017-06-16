@@ -5,7 +5,7 @@
     <artifactId>ratingstars</artifactId>
     <packaging>jar</packaging>
     <name>RatingStars</name>
-    <version>3.0-beta3</version>
+    <version>3.0.0</version>
 
     <organization>
         <name>Teemu Pöntelin</name>
@@ -22,7 +22,7 @@
         <Vaadin-Addon>${project.artifactId}-${project.version}.jar</Vaadin-Addon>
         <widgetset.name>org.vaadin.teemu.ratingstars.gwt.RatingStarsWidgetset</widgetset.name>
 
-        <vaadin.version>8.0.0.beta2</vaadin.version>
+        <vaadin.version>8.0.0</vaadin.version>
 
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
         <maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
